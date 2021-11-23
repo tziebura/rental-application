@@ -4,5 +4,5 @@ namespace App\Domain\Apartment;
 
 interface ApartmentRepository
 {
-    function save(Apartment $apartment): void;
+    public function save(Apartment $apartment): void;
 }
