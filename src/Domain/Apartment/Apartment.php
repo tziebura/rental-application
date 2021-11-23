@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Application\Apartment;
-
-use App\Domain\Apartment\Address;
+namespace App\Domain\Apartment;
 
 class Apartment
 {
