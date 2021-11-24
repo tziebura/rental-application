@@ -2,13 +2,41 @@
 
 namespace App\Domain\Apartment;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Embeddable()
+ */
 class Address
 {
+    /**
+     * @ORM\Column()
+     */
     private string $street;
+
+    /**
+     * @ORM\Column()
+     */
     private string $postalCode;
+
+    /**
+     * @ORM\Column()
+     */
     private string $houseNumber;
+
+    /**
+     * @ORM\Column()
+     */
     private string $apartmentNumber;
+
+    /**
+     * @ORM\Column()
+     */
     private string $city;
+
+    /**
+     * @ORM\Column()
+     */
     private string $country;
 
     public function __construct(string $street, string $postalCode, string $houseNumber, string $apartmentNumber, string $city, string $country)
