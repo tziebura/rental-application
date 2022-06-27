@@ -10,11 +10,17 @@ doctrine:
                 is_bundle: false
                 type: annotation
                 dir: '%kernel.project_dir%/src/Domain/Apartment'
-                prefix: 'App\Domain'
+                prefix: 'App\Domain\Apartment'
                 alias: Apartment
-#            App:
-#                is_bundle: false
-#                type: annotation
-#                dir: '%kernel.project_dir%/src/Entity'
-#                prefix: 'App\Entity'
-#                alias: App
+            Hotel:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Domain/Hotel'
+                prefix: 'App\Domain\Hotel'
+                alias: Hotel
+            HotelRoom:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Domain/HotelRoom'
+                prefix: 'App\Domain\HotelRoom'
+                alias: HotelRoom

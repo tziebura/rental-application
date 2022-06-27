@@ -11,6 +11,7 @@ class Room
 {
     /**
      * @ORM\Id()
+     * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
      */
     private int $id;
@@ -21,7 +22,7 @@ class Room
     private string $name;
 
     /**
-     * @ORM\Embedded(class="SquareMeter")
+     * @ORM\Embedded(class="App\Domain\Apartment\SquareMeter")
      */
     private SquareMeter $squareMeter;
 

@@ -11,6 +11,7 @@ class Apartment
 {
     /**
      * @ORM\Id()
+     * @ORM\GeneratedValue(strategy="AUTO")
      * @ORM\Column(type="integer")
      */
     private int $id;
@@ -21,7 +22,7 @@ class Apartment
     private string $ownerId;
 
     /**
-     * @ORM\Embedded(class = "Address")
+     * @ORM\Embedded(class="App\Domain\Apartment\Address")
      */
     private Address $address;
 
@@ -31,7 +32,7 @@ class Apartment
     private string $description;
 
     /**
-     * @ORM\OneToMany(targetEntity="Room", mappedBy="apartment")
+     * @ORM\OneToMany(targetEntity="App\Domain\Apartment\Room", mappedBy="apartment")
      */
     private array $rooms;
 

@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{Domain,Kernel.php}'
+
+    App\Application\Apartment\ApartmentApplicationService: '@App\Infrastructure\Persistence\Sql\Apartment\SqlApartmentRepository'
