@@ -2,15 +2,45 @@
 
 namespace App\Infrastructure\Web\Rest\Api\Apartment;
 
-class ApartmentDto
+use Symfony\Component\Validator\Constraints as Assert;
+
+class ApartmentDTO
 {
     private string $ownerId;
+
+    /**
+     * @Assert\NotBlank()
+     */
     private string $street;
+
+    /**
+     * @Assert\NotBlank()
+     */
     private string $postalCode;
+
+    /**
+     * @Assert\NotBlank()
+     */
     private string $houseNumber;
+
+    /**
+     * @Assert\NotBlank()
+     */
     private string $apartmentNumber;
+
+    /**
+     * @Assert\NotBlank()
+     */
     private string $city;
+
+    /**
+     * @Assert\NotBlank()
+     */
     private string $country;
+
+    /**
+     * @Assert\NotBlank()
+     */
     private string $description;
 
     /**

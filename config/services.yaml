@@ -7,4 +7,11 @@ services:
         resource: '../src/*'
         exclude: '../src/{Domain,Kernel.php}'
 
-    App\Application\Apartment\ApartmentApplicationService: '@App\Infrastructure\Persistence\Sql\Apartment\SqlApartmentRepository'
+    App\Domain\Apartment\ApartmentRepository: '@App\Infrastructure\Persistence\Sql\Apartment\SqlApartmentRepository'
+
+    App\Framework\Symfony\Extension\RequestDTOResolver:
+        arguments:
+            - '@validator'
+            - '@serializer'
+        tags:
+            - { name: controller.request_value_resolver, priority: 50 }

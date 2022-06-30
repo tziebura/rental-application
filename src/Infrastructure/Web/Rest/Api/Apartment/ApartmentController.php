@@ -20,12 +20,10 @@ class ApartmentController extends AbstractController
         $this->apartmentApplicationService = $apartmentApplicationService;
     }
 
-    // TODO create request DTO resolver based on this article https://kvashnin.github.io/blog/using-request-dto-in-symfony/
-
     /**
      * @Route(path="/", name="create", methods={"POST"})
      */
-    public function post(ApartmentDto $dto): Response
+    public function post(ApartmentDTO $dto): Response
     {
         $this->apartmentApplicationService->add(
             $dto->getOwnerId(),
