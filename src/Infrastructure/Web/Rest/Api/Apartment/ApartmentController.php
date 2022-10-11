@@ -39,4 +39,18 @@ class ApartmentController extends AbstractController
 
         return new JsonResponse([], Response::HTTP_CREATED);
     }
+
+    /**
+     * @Route(path="/book/{id}", name="book", methods={"PUT"})
+     */
+    public function book(string $id, ApartmentBookingDto $apartmentBookingDto): Response {
+        $this->apartmentApplicationService->book(
+            $id,
+            $apartmentBookingDto->getTenantId(),
+            $apartmentBookingDto->getStart(),
+            $apartmentBookingDto->getEnd()
+        );
+
+        return new JsonResponse([], Response::HTTP_OK);
+    }
 }

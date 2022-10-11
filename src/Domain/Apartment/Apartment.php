@@ -2,6 +2,7 @@
 
 namespace App\Domain\Apartment;
 
+use App\Domain\EventChannel\EventChannel;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -45,5 +46,17 @@ class Apartment
             $room->assignToApartment($this);
             return $room;
         }, $rooms);
+    }
+
+    public function book(string $tenantId, Period $period, EventChannel $eventChannel)
+    {
+        $event = ApartmentBooked::create(
+            $this->id,
+            $this->ownerId,
+            $tenantId,
+            $period
+        );
+
+        $eventChannel->publish($event);
     }
 }

@@ -33,4 +33,18 @@ class HotelRoomController
 
         return new JsonResponse([], Response::HTTP_CREATED);
     }
+
+    /**
+     * @Route(path="/book/{id}", name="book", methods={"PUT"})
+     */
+    public function book(string $id, HotelRoomBookingDto $bookingDto): Response
+    {
+        $this->hotelRoomApplicationService->book(
+            $id,
+            $bookingDto->getDays(),
+            $bookingDto->getTenantId()
+        );
+
+        return new JsonResponse([], Response::HTTP_OK);
+    }
 }

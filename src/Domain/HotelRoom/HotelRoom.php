@@ -2,6 +2,7 @@
 
 namespace App\Domain\HotelRoom;
 
+use App\Domain\EventChannel\EventChannel;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -45,5 +46,17 @@ class HotelRoom
         $this->rooms = array_map(function (Room $room) {
             $room->assignToHotelRoom($this);
         }, $rooms);
+    }
+
+    public function book(array $days, string $tenantId, EventChannel $eventChannel)
+    {
+        $event = HotelRoomBooked::create(
+            $this->id,
+            $this->hotelId,
+            $days,
+            $tenantId
+        );
+
+        $eventChannel->publish($event);
     }
 }
