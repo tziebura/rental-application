@@ -37,4 +37,21 @@ class Period
     {
         return $this->end;
     }
+
+    /**
+     * @return DateTimeImmutable[]
+     */
+    public function asDays(): array
+    {
+        $start = $this->start;
+        $days  = [$start];
+
+        while ($start < $this->end) {
+            $start = $start->modify('+1day');
+            $days[] = $start;
+        }
+
+        $days[] = $this->end;
+        return $days;
+    }
 }

@@ -48,7 +48,7 @@ class Apartment
         }, $rooms);
     }
 
-    public function book(string $tenantId, Period $period, EventChannel $eventChannel)
+    public function book(string $tenantId, Period $period, EventChannel $eventChannel): Booking
     {
         $event = ApartmentBooked::create(
             $this->id,
@@ -58,5 +58,11 @@ class Apartment
         );
 
         $eventChannel->publish($event);
+
+        return Booking::apartment(
+            $this->id,
+            $tenantId,
+            $period
+        );
     }
 }

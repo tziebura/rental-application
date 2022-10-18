@@ -4,6 +4,7 @@ namespace App\Application\Apartment;
 
  use App\Domain\Apartment\ApartmentFactory;
  use App\Domain\Apartment\ApartmentRepository;
+ use App\Domain\Apartment\BookingRepository;
  use App\Domain\Apartment\Period;
  use App\Domain\EventChannel\EventChannel;
  use DateTimeImmutable;
@@ -12,11 +13,13 @@ namespace App\Application\Apartment;
 {
     private ApartmentRepository $apartmentRepository;
     private EventChannel $eventChannel;
+    private BookingRepository $bookingRepository;
 
-     public function __construct(ApartmentRepository $apartmentRepository, EventChannel $eventChannel)
+     public function __construct(ApartmentRepository $apartmentRepository, EventChannel $eventChannel, BookingRepository $bookingRepository)
      {
          $this->apartmentRepository = $apartmentRepository;
          $this->eventChannel = $eventChannel;
+         $this->bookingRepository = $bookingRepository;
      }
 
      public function add(
@@ -35,6 +38,8 @@ namespace App\Application\Apartment;
         $apartment = $this->apartmentRepository->findById($id);
         $period = Period::of($start, $end);
 
-        $apartment->book($tenantId, $period, $this->eventChannel);
+        $booking = $apartment->book($tenantId, $period, $this->eventChannel);
+
+        $this->bookingRepository->save($booking);
      }
  }

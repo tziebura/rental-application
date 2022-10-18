@@ -2,6 +2,7 @@
 
 namespace App\Domain\HotelRoom;
 
+use App\Domain\Apartment\Booking;
 use App\Domain\EventChannel\EventChannel;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -58,5 +59,11 @@ class HotelRoom
         );
 
         $eventChannel->publish($event);
+
+        return Booking::hotelRoom(
+            $this->id,
+            $tenantId,
+            $days
+        );
     }
 }
