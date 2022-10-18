@@ -18,4 +18,9 @@ class SqlBookingRepository implements BookingRepository
     {
         $this->repository->save($booking);
     }
+
+    public function findById(string $id): ?Booking
+    {
+        return $this->repository->find($id);
+    }
 }

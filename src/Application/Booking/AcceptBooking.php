@@ -10,4 +10,9 @@ class AcceptBooking
     {
         $this->id = $id;
     }
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
 }
