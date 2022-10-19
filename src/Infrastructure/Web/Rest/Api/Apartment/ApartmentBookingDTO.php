@@ -4,7 +4,7 @@ namespace App\Infrastructure\Web\Rest\Api\Apartment;
 
 use DateTimeImmutable;
 
-class ApartmentBookingDto
+class ApartmentBookingDTO
 {
     private string $tenantId;
     private DateTimeImmutable $start;

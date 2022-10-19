@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\EventChannel;
+namespace App\Infrastructure\EventChannel\Symfony;
 
 use App\Domain\EventChannel\EventChannel;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;

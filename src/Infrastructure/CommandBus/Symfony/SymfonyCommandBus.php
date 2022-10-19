@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Symfony\CommandBus;
+namespace App\Infrastructure\CommandBus\Symfony;
 
 use App\Application\CommandBus\CommandBus;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;

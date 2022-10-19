@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ * @ORM\Table(name="apartment_rooms")
  */
 class Room
 {
@@ -28,7 +29,7 @@ class Room
 
     /**
      * @ORM\ManyToOne(targetEntity="Apartment", inversedBy="rooms")
-     * @ORM\JoinColumn(name="apartment_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="apartment_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private Apartment $apartment;
 

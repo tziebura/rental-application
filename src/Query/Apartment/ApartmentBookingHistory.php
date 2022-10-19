@@ -2,20 +2,23 @@
 
 namespace App\Query\Apartment;
 
-use Doctrine\Common\Collections\Collection;
-
-/**
- * @todo add ORM annotations.
- */
 class ApartmentBookingHistory
 {
-    private string $apartmentId;
-    private Collection $bookings;
+    private int $apartmentId;
+    private array $bookings;
 
-    public function __construct(string $apartmentId, Collection $bookings)
+    public function __construct(int $apartmentId, array $bookings)
     {
         $this->apartmentId = $apartmentId;
         $this->bookings = $bookings;
+    }
+
+    public static function fromArray(array $data)
+    {
+        return new self(
+            (int) $data['apartment_id'],
+            array_map(fn(array $booking) => ApartmentBooking::fromArray($booking), $data['bookings'])
+        );
     }
 
     public function getApartmentId(): string
@@ -23,7 +26,7 @@ class ApartmentBookingHistory
         return $this->apartmentId;
     }
 
-    public function getBookings(): Collection
+    public function getBookings(): array
     {
         return $this->bookings;
     }

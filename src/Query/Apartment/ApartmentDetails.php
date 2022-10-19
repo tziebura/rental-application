@@ -2,15 +2,12 @@
 
 namespace App\Query\Apartment;
 
-/**
- * @todo add ORM annotations.
- */
 class ApartmentDetails
 {
     private Apartment $apartment;
-    private ApartmentBookingHistory $bookingHistory;
+    private ?ApartmentBookingHistory $bookingHistory;
 
-    public function __construct(Apartment $apartment, ApartmentBookingHistory $bookingHistory)
+    public function __construct(Apartment $apartment, ?ApartmentBookingHistory $bookingHistory = null)
     {
         $this->apartment = $apartment;
         $this->bookingHistory = $bookingHistory;
@@ -21,7 +18,7 @@ class ApartmentDetails
         return $this->apartment;
     }
 
-    public function getBookingHistory(): ApartmentBookingHistory
+    public function getBookingHistory(): ?ApartmentBookingHistory
     {
         return $this->bookingHistory;
     }

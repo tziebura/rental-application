@@ -3,11 +3,22 @@
 namespace App\Domain\ApartmentBookingHistory;
 
 use DateTimeImmutable;
+use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 
+/**
+ * @ORM\Embeddable()
+ */
 class BookingPeriod
 {
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
     private DateTimeImmutable $start;
+
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
     private DateTimeImmutable $end;
 
     public function __construct(DateTimeImmutable $start, DateTimeImmutable $end)

@@ -2,9 +2,6 @@
 
 namespace App\Query\Apartment;
 
-/**
- * @todo add ORM annotations
- */
 class Apartment
 {
     private int $id;
@@ -17,6 +14,36 @@ class Apartment
     private string $country;
     private string $description;
     private array $rooms;
+
+    public function __construct(int $id, string $ownerId, string $street, string $postalCode, string $houseNumber, string $apartmentNumber, string $city, string $country, string $description, array $rooms)
+    {
+        $this->id = $id;
+        $this->ownerId = $ownerId;
+        $this->street = $street;
+        $this->postalCode = $postalCode;
+        $this->houseNumber = $houseNumber;
+        $this->apartmentNumber = $apartmentNumber;
+        $this->city = $city;
+        $this->country = $country;
+        $this->description = $description;
+        $this->rooms = $rooms;
+    }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            (int) $data['id'],
+            $data['owner_id'],
+            $data['address_street'],
+            $data['address_postal_code'],
+            $data['address_house_number'],
+            $data['address_apartment_number'],
+            $data['address_city'],
+            $data['address_country'],
+            $data['description'],
+            array_map(fn (array $room) => Room::fromArray($room), $data['rooms'])
+        );
+    }
 
     public function getId(): int
     {

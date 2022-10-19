@@ -33,9 +33,9 @@ class ApartmentController extends AbstractController
     public function index(): Response
     {
         $apartments = $this->apartmentReadModel->findAll();
-        return new Response(
-            $this->serializer->serialize($apartments, 'json')
-        );
+        return new Response($this->serializer->serialize($apartments, 'json'), Response::HTTP_OK, [
+            'Content-Type' => 'application/json',
+        ]);
     }
 
     /**
@@ -49,9 +49,9 @@ class ApartmentController extends AbstractController
             throw new NotFoundHttpException('Apartment not found.');
         }
 
-        return new Response(
-            $this->serializer->serialize($apartment, 'json')
-        );
+        return new Response($this->serializer->serialize($apartment, 'json'), Response::HTTP_OK, [
+            'Content-Type' => 'application/json',
+        ]);
     }
 
     /**
@@ -77,7 +77,7 @@ class ApartmentController extends AbstractController
     /**
      * @Route(path="/book/{id}", name="book", methods={"PUT"})
      */
-    public function book(string $id, ApartmentBookingDto $apartmentBookingDto): Response {
+    public function book(string $id, ApartmentBookingDTO $apartmentBookingDto): Response {
         $this->apartmentApplicationService->book(
             $id,
             $apartmentBookingDto->getTenantId(),

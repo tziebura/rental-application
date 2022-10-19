@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Persistence\Sql\HotelRoomBookingHistory;
+namespace App\Infrastructure\Persistence\Sql\HotelBookingHistory;
 
 use App\Domain\HotelBookingHistory\HotelBookingHistory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

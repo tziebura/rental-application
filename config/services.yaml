@@ -7,6 +7,10 @@ services:
         resource: '../src/*'
         exclude: '../src/{Domain,Kernel.php}'
 
+    App\Domain\EventChannel\EventChannel: '@App\Infrastructure\EventChannel\Symfony\SymfonyEventChannel'
+    App\Domain\Apartment\BookingRepository: '@App\Infrastructure\Persistence\Sql\Booking\SqlBookingRepository'
+    App\Domain\ApartmentBookingHistory\ApartmentBookingHistoryRepository: '@App\Infrastructure\Persistence\Sql\ApartmentBookingHistory\SqlApartmentBookingHistoryRepository'
+    App\Domain\HotelBookingHistory\HotelBookingHistoryRepository: '@App\Infrastructure\Persistence\Sql\HotelBookingHistory\SqlHotelBookingHistoryRepository'
     App\Domain\Apartment\ApartmentRepository: '@App\Infrastructure\Persistence\Sql\Apartment\SqlApartmentRepository'
 
     App\Framework\Symfony\Extension\RequestDTOResolver:

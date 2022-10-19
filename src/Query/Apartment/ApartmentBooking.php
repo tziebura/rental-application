@@ -4,11 +4,10 @@ namespace App\Query\Apartment;
 
 use DateTimeImmutable;
 
-/**
- * @todo add ORM annotations.
- */
 class ApartmentBooking
 {
+    private const DB_DATE_FORMAT = 'Y-m-d H:i:s';
+
     private int $id;
     private string $step;
     private DateTimeImmutable $bookingDateTime;
@@ -26,6 +25,19 @@ class ApartmentBooking
         $this->tenantId = $tenantId;
         $this->bookingStart = $bookingStart;
         $this->bookingEnd = $bookingEnd;
+    }
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            (int) $data['id'],
+            $data['step'],
+            DateTimeImmutable::createFromFormat(self::DB_DATE_FORMAT, $data['booking_date_time']),
+            $data['owner_id'],
+            $data['tenant_id'],
+            DateTimeImmutable::createFromFormat(self::DB_DATE_FORMAT, $data['booking_period_start']),
+            DateTimeImmutable::createFromFormat(self::DB_DATE_FORMAT, $data['booking_period_end']),
+        );
     }
 
     public function getId(): int

@@ -3,17 +3,43 @@
 namespace App\Domain\Apartment;
 
 use App\Domain\EventChannel\EventChannel;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @todo add ORM annotation
+ * @ORM\Entity()
  */
 class Booking
 {
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="integer")
+     */
     private ?int $id;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
     private int $rentalPlaceId;
+
+    /**
+     * @ORM\Column()
+     */
     private string $tenantId;
+
+    /**
+     * @ORM\Column()
+     */
     private string $rentalType;
+
+    /**
+     * @ORM\Column(type="array")
+     */
     private array $dates;
+
+    /**
+     * @ORM\Column()
+     */
     private string $status;
 
     public function __construct(int $rentalPlaceId, string $tenantId, string $rentalType, array $dates)

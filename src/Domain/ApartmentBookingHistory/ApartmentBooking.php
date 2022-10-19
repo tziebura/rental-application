@@ -3,19 +3,50 @@
 namespace App\Domain\ApartmentBookingHistory;
 
 use DateTimeImmutable;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @todo add ORM annotation
+ * @ORM\Entity()
+ * @ORM\Table(name="apartment_bookings")
  */
 class ApartmentBooking
 {
-
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="integer")
+     */
     private ?int $id;
+
+    /**
+     * @ORM\Column()
+     */
     private string $step;
+
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
     private DateTimeImmutable $bookingDateTime;
+
+    /**
+     * @ORM\Column()
+     */
     private string $ownerId;
+
+    /**
+     * @ORM\Column()
+     */
     private string $tenantId;
+
+    /**
+     * @ORM\Embedded(class="BookingPeriod")
+     */
     private BookingPeriod $bookingPeriod;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Domain\ApartmentBookingHistory\ApartmentBookingHistory", inversedBy="bookings")
+     * @ORM\JoinColumn(referencedColumnName="apartment_id", onDelete="CASCADE")
+     */
     private ApartmentBookingHistory $apartmentBookingHistory;
 
     public function __construct(string $step, DateTimeImmutable $bookingDateTime, string $ownerId, string $tenantId, BookingPeriod $bookingPeriod)

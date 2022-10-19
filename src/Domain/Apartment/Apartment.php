@@ -3,10 +3,13 @@
 namespace App\Domain\Apartment;
 
 use App\Domain\EventChannel\EventChannel;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity()
+ * @ORM\Table(name="apartments")
  */
 class Apartment
 {
@@ -33,19 +36,19 @@ class Apartment
     private string $description;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Domain\Apartment\Room", mappedBy="apartment")
+     * @ORM\OneToMany(targetEntity="App\Domain\Apartment\Room", mappedBy="apartment", cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    private array $rooms;
+    private Collection $rooms;
 
     public function __construct(string $ownerId, Address $address, string $description, array $rooms)
     {
         $this->ownerId = $ownerId;
         $this->address = $address;
         $this->description = $description;
-        $this->rooms = array_map(function (Room $room) {
+        $this->rooms = new ArrayCollection(array_map(function (Room $room) {
             $room->assignToApartment($this);
             return $room;
-        }, $rooms);
+        }, $rooms));
     }
 
     public function book(string $tenantId, Period $period, EventChannel $eventChannel): Booking
