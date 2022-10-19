@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Web\Rest\Api\Apartment;
 
 use App\Application\Apartment\ApartmentApplicationService;
+use App\Query\Apartment\ApartmentReadModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,10 +15,19 @@ use Symfony\Component\Routing\Annotation\Route;
 class ApartmentController extends AbstractController
 {
     private ApartmentApplicationService $apartmentApplicationService;
+    private ApartmentReadModel $apartmentReadModel;
 
     public function __construct(ApartmentApplicationService $apartmentApplicationService)
     {
         $this->apartmentApplicationService = $apartmentApplicationService;
+    }
+
+    /**
+     * @Route(path="/", name="index", methods={"GET"})
+     */
+    public function index(): Response
+    {
+        $apartments = $this->apartmentReadModel->findAll();
     }
 
     /**
