@@ -3,6 +3,7 @@
 namespace App\Domain\ApartmentBookingHistory;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @todo add ORM annotation
@@ -10,7 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class ApartmentBookingHistory
 {
     private string $apartmentId;
-    private string $bookings;
+    private Collection $bookings;
 
     public function __construct(string $apartmentId)
     {

@@ -2,6 +2,9 @@
 
 namespace App\Query\Apartment;
 
+/**
+ * @todo add ORM annotations
+ */
 class Room
 {
     private int $id;

@@ -7,7 +7,9 @@ use App\Query\Apartment\ApartmentReadModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @Route(path="/rest/v1/apartment", name="api_v1_apartment_")
@@ -16,10 +18,13 @@ class ApartmentController extends AbstractController
 {
     private ApartmentApplicationService $apartmentApplicationService;
     private ApartmentReadModel $apartmentReadModel;
+    private SerializerInterface $serializer;
 
-    public function __construct(ApartmentApplicationService $apartmentApplicationService)
+    public function __construct(ApartmentApplicationService $apartmentApplicationService, ApartmentReadModel $apartmentReadModel, SerializerInterface $serializer)
     {
         $this->apartmentApplicationService = $apartmentApplicationService;
+        $this->apartmentReadModel = $apartmentReadModel;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -28,6 +33,25 @@ class ApartmentController extends AbstractController
     public function index(): Response
     {
         $apartments = $this->apartmentReadModel->findAll();
+        return new Response(
+            $this->serializer->serialize($apartments, 'json')
+        );
+    }
+
+    /**
+     * @Route(path="/{id}", name="get", methods={"GET"})
+     */
+    public function get(string $id): Response
+    {
+        $apartment = $this->apartmentReadModel->findById($id);
+
+        if (!$apartment) {
+            throw new NotFoundHttpException('Apartment not found.');
+        }
+
+        return new Response(
+            $this->serializer->serialize($apartment, 'json')
+        );
     }
 
     /**

@@ -4,15 +4,28 @@ namespace App\Query\Apartment;
 
 class SqlApartmentReadModel implements ApartmentReadModel
 {
-    private DoctrineOrmApartmentRepository $repository;
+    private DoctrineOrmApartmentRepository $apartmentRepository;
+    private DoctrineOrmApartmentBookingHistoryRepository $apartmentBookingHistoryRepository;
 
-    public function __construct(DoctrineOrmApartmentRepository $repository)
+    public function __construct(DoctrineOrmApartmentRepository $apartmentRepository, DoctrineOrmApartmentBookingHistoryRepository $apartmentBookingHistoryRepository)
     {
-        $this->repository = $repository;
+        $this->apartmentRepository = $apartmentRepository;
+        $this->apartmentBookingHistoryRepository = $apartmentBookingHistoryRepository;
     }
 
     public function findAll(): array
     {
-        return $this->repository->findAll();
+        return $this->apartmentRepository->findAll();
+    }
+
+    public function findById(string $id): ?ApartmentDetails
+    {
+        $apartment = $this->apartmentRepository->find($id);
+        $history   = $this->apartmentBookingHistoryRepository->find($id);
+
+        return new ApartmentDetails(
+            $apartment,
+            $history
+        );
     }
 }
