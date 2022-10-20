@@ -4,6 +4,8 @@ namespace App\Domain\HotelRoom;
 
 use App\Domain\Apartment\Booking;
 use App\Domain\EventChannel\EventChannel;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -37,16 +39,17 @@ class HotelRoom
     /**
      * @ORM\OneToMany(targetEntity="App\Domain\HotelRoom\Room", mappedBy="hotelRoom", cascade={"persist", "remove"}, orphanRemoval=true)
      */
-    private array $rooms;
+    private Collection $rooms;
 
     public function __construct(string $hotelId, int $number, string $description, array $rooms)
     {
         $this->hotelId = $hotelId;
         $this->number = $number;
         $this->description = $description;
-        $this->rooms = array_map(function (Room $room) {
+        $this->rooms = new ArrayCollection(array_map(function (Room $room) {
             $room->assignToHotelRoom($this);
-        }, $rooms);
+            return $room;
+        }, $rooms));
     }
 
     public function book(array $days, string $tenantId, EventChannel $eventChannel)

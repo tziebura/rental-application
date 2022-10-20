@@ -3,20 +3,39 @@
 namespace App\Infrastructure\Web\Rest\Api\HotelRoom;
 
 use App\Application\HotelRoom\HotelRoomApplicationService;
+use App\Query\HotelRoom\HotelRoomReadModel;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @Route(path="/rest/v1/hotel-room", name="api_v1_hotel_room_")
  */
-class HotelRoomController
+class HotelRoomController extends AbstractController
 {
     private HotelRoomApplicationService $hotelRoomApplicationService;
+    private HotelRoomReadModel $hotelRoomReadModel;
+    private SerializerInterface $serializer;
 
-    public function __construct(HotelRoomApplicationService $hotelRoomApplicationService)
+    public function __construct(HotelRoomApplicationService $hotelRoomApplicationService, HotelRoomReadModel $hotelRoomReadModel, SerializerInterface $serializer)
     {
         $this->hotelRoomApplicationService = $hotelRoomApplicationService;
+        $this->hotelRoomReadModel = $hotelRoomReadModel;
+        $this->serializer = $serializer;
+    }
+
+    /**
+     * @Route(path="/hotel/{hotelId}", name="get_by_hotel", methods={"GET"})
+     */
+    public function index(string $hotelId): Response
+    {
+        $hotelRooms = $this->hotelRoomReadModel->findByHotel($hotelId);
+
+        return new Response($this->serializer->serialize($hotelRooms, 'json'), Response::HTTP_OK, [
+            'Content-Type' => 'application/json'
+        ]);
     }
 
     /**
