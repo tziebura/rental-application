@@ -51,7 +51,6 @@ class Period
             $days[] = $start;
         }
 
-        $days[] = $this->end;
         return $days;
     }
 }
