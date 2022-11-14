@@ -23,10 +23,6 @@ class HotelRoomBookingHistory
 
     public function add(HotelRoomBooking $booking): void
     {
-        if ($this->bookings->contains($booking)) {
-            return;
-        }
-
         $this->bookings->add($booking);
         $booking->setHotelRoomBookingHistory($this);
     }

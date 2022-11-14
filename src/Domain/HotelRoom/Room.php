@@ -41,10 +41,6 @@ class Room
 
     public function assignToHotelRoom(HotelRoom $apartment)
     {
-        if (isset($this->hotelRoom)) {
-            throw new LogicException('Room cannot be reassigned');
-        }
-
         $this->hotelRoom = $apartment;
     }
 }

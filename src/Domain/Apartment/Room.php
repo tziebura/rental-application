@@ -41,10 +41,6 @@ class Room
 
     public function assignToApartment(Apartment $apartment)
     {
-        if (isset($this->apartment)) {
-            throw new \LogicException('Room cannot be reassigned');
-        }
-
         $this->apartment = $apartment;
     }
 }

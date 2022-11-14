@@ -24,7 +24,7 @@ class BookingPeriod
     public function __construct(DateTimeImmutable $start, DateTimeImmutable $end)
     {
         if ($start > $end) {
-            throw new InvalidArgumentException('Start cannot be greater than end');
+            throw new InvalidArgumentException('Start cannot be greater than end.');
         }
 
         $this->start = $start;

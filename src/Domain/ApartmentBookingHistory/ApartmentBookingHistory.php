@@ -32,10 +32,6 @@ class ApartmentBookingHistory
 
     public function add(ApartmentBooking $booking): void
     {
-        if ($this->bookings->contains($booking)) {
-            return;
-        }
-
         $this->bookings->add($booking);
         $booking->setApartmentBookingHistory($this);
     }

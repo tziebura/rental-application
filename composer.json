@@ -70,6 +70,7 @@
         }
     },
     "require-dev": {
+        "pcov/clobber": "^2.0",
         "phpstan/phpstan": "^1.9",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "5.3.*",

@@ -11,12 +11,12 @@ class PeriodTest extends TestCase
     /**
      * @test
      */
-    public function testShouldReturnAllDaysBetweenStartAndEnd()
+    public function shouldReturnAllDaysBetweenStartAndEnd()
     {
         $start = new DateTimeImmutable('01-01-2022');
         $end = new DateTimeImmutable('03-01-2022');
 
-        $actual = new Period($start, $end);
+        $actual = Period::of($start, $end);
 
         $this->assertEquals(
             [
@@ -26,5 +26,19 @@ class PeriodTest extends TestCase
             ],
             $actual->asDays()
         );
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowExceptionWhenStartIsGreaterThanEnd()
+    {
+        $start = new DateTimeImmutable('03-01-2022');
+        $end = new DateTimeImmutable('01-01-2022');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Start cannot be greater than end.');
+
+        Period::of($start, $end);
     }
 }

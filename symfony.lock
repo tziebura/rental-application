@@ -97,6 +97,9 @@
     "nikic/php-parser": {
         "version": "v4.15.1"
     },
+    "pcov/clobber": {
+        "version": "v2.0.3"
+    },
     "phar-io/manifest": {
         "version": "2.0.3"
     },

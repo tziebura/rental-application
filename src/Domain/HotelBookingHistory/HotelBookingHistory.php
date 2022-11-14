@@ -31,7 +31,7 @@ class HotelBookingHistory
         ));
     }
 
-    public function findFor(int $hotelRoomId): HotelRoomBookingHistory
+    private function findFor(int $hotelRoomId): HotelRoomBookingHistory
     {
         $booking = $this->hotelRoomBookingHistories
             ->filter(fn (HotelRoomBookingHistory $history) => $history->getHotelRoomId() === $hotelRoomId)
