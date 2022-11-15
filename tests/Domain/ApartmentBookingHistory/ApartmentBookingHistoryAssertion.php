@@ -42,16 +42,28 @@ class ApartmentBookingHistoryAssertion
         DateTimeImmutable $expectedBookingDateTime, string $expectedOwnerId, string $expectedTenantId,
         BookingPeriod $expectedBookingPeriod, string $expectedStep)
     {
-        /** @var Collection<int, ApartmentBooking $bookings */
-        $bookings = $this->getByReflection($this->actual, 'bookings');
+        /** @var Collection<int, ApartmentBooking $actualBookings */
+        $actualBookings = $this->getByReflection($this->actual, 'bookings');
 
-        $actualBooking = $bookings->first();
+        $found = false;
+        foreach ($actualBookings as $actualBooking) {
+            if (
+                $expectedBookingDateTime == $this->getByReflection($actualBooking, 'bookingDateTime')
+                &&
+                $expectedOwnerId === $this->getByReflection($actualBooking, 'ownerId')
+                &&
+                $expectedTenantId === $this->getByReflection($actualBooking, 'tenantId')
+                &&
+                $expectedBookingPeriod == $this->getByReflection($actualBooking, 'bookingPeriod')
+                &&
+                $expectedStep === $this->getByReflection($actualBooking, 'step')
+            ) {
+                $found = true;
+                break;
+            }
+        }
 
-        TestCase::assertEquals($expectedBookingDateTime, $this->getByReflection($actualBooking, 'bookingDateTime'));
-        TestCase::assertEquals($expectedOwnerId, $this->getByReflection($actualBooking, 'ownerId'));
-        TestCase::assertEquals($expectedTenantId, $this->getByReflection($actualBooking, 'tenantId'));
-        TestCase::assertEquals($expectedBookingPeriod, $this->getByReflection($actualBooking, 'bookingPeriod'));
-        TestCase::assertEquals($expectedStep, $this->getByReflection($actualBooking, 'step'));
+        TestCase::assertTrue($found);
     }
 
 }
