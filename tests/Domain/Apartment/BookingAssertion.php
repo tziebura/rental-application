@@ -65,4 +65,10 @@ class BookingAssertion
         TestCase::assertEquals(BookingStatus::REJECTED, $this->getByReflection($this->actual, 'status'));
         return $this;
     }
+
+    public function isAccepted(): self
+    {
+        TestCase::assertEquals(BookingStatus::ACCEPTED, $this->getByReflection($this->actual, 'status'));
+        return $this;
+    }
 }

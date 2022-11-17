@@ -42,19 +42,36 @@ class HotelBookingHistoryAssertion
         int $expectedHotelRoomId, DateTimeImmutable $expectedBookingDateTime,
         string $expectedTenantId, array $expectedDays, string $expectedStep)
     {
-        /** @var Collection $histories */
-        $histories = $this->getByReflection($this->actual, 'hotelRoomBookingHistories');
+        /** @var Collection<int, HotelRoomBookingHistory> $histories */
+        $actualHistories = $this->getByReflection($this->actual, 'hotelRoomBookingHistories');
+
+        $found = false;
 
         /** @var HotelRoomBookingHistory $actualHistory */
-        $actualHistory = $histories->first();
+        foreach ($actualHistories as $actualHistory) {
+            if ($expectedHotelRoomId !== $actualHistory->getHotelRoomId()) {
+                continue;
+            }
 
-        /** @var HotelRoomBooking $actualHistory */
-        $actualBooking = $this->getByReflection($actualHistory, 'bookings')->first();
+            /** @var Collection<int, HotelRoomBooking> $actualBookings */
+            $actualBookings = $this->getByReflection($actualHistory, 'bookings');
 
-        TestCase::assertEquals($expectedHotelRoomId, $actualHistory->getHotelRoomId());
-        TestCase::assertEquals($expectedBookingDateTime, $this->getByReflection($actualBooking, 'bookingDateTime'));
-        TestCase::assertEquals($expectedTenantId, $this->getByReflection($actualBooking, 'tenantId'));
-        TestCase::assertEquals($expectedDays, $this->getByReflection($actualBooking, 'days'));
-        TestCase::assertEquals($expectedStep, $this->getByReflection($actualBooking, 'step'));
+            foreach ($actualBookings as $actualBooking) {
+                if (
+                    $expectedBookingDateTime->getTimestamp() === $this->getByReflection($actualBooking, 'bookingDateTime')->getTimestamp()
+                    &&
+                    $expectedTenantId === $this->getByReflection($actualBooking, 'tenantId')
+                    &&
+                    $expectedStep === $this->getByReflection($actualBooking, 'step')
+                    &&
+                    $expectedDays === $this->getByReflection($actualBooking, 'days')
+                ) {
+                    $found = true;
+                    break 2;
+                }
+            }
+        }
+
+        TestCase::assertTrue($found);
     }
 }
