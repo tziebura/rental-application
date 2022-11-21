@@ -31,7 +31,11 @@
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "symfony/flex": true,
+            "symfony/runtime": true
+        }
     },
     "autoload": {
         "psr-4": {
@@ -70,6 +74,9 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
+        "liip/functional-test-bundle": "^4.5",
+        "liip/test-fixtures-bundle": "^2.0.0",
         "pcov/clobber": "^2.0",
         "phpstan/phpstan": "^1.9",
         "phpunit/phpunit": "^9.5",
