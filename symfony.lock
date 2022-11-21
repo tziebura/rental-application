@@ -127,6 +127,9 @@
     "phar-io/version": {
         "version": "3.2.1"
     },
+    "phpat/phpat": {
+        "version": "0.10.0"
+    },
     "phpdocumentor/reflection-common": {
         "version": "2.2.0"
     },

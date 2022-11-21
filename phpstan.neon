@@ -1,0 +1,24 @@
+parameters:
+	level: 0
+	paths:
+		- src
+		- tests
+includes:
+    - vendor/phpat/phpat/extension.neon
+services:
+    -
+        class: App\Tests\Architecture\DomainTest
+        tags:
+            - phpat.test
+    -
+        class: App\Tests\Architecture\ApplicationTest
+        tags:
+            - phpat.test
+    -
+        class: App\Tests\Architecture\InfrastructureTest
+        tags:
+            - phpat.test
+    -
+        class: App\Tests\Architecture\QueryTest
+        tags:
+            - phpat.test
