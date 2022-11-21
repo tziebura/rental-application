@@ -1,0 +1,6 @@
+services:
+  App\Tests\Infrastructure\Web\Rest\Api\Apartment\Fixtures\ApartmentFixture:
+    tags: ['doctrine.fixture.orm']
+
+  App\Tests\Infrastructure\Web\Rest\Api\Apartment\Fixtures\ApartmentBookingHistoryFixture:
+    tags: [ 'doctrine.fixture.orm' ]

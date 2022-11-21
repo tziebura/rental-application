@@ -1,0 +1,34 @@
+{
+  "apartment": {
+    "id": 1,
+    "owner_id": "1234",
+    "street": "Florianska",
+    "postal_code": "98-765",
+    "house_number": "12",
+    "apartment_number": "34",
+    "city": "Krakow",
+    "country": "Poland",
+    "description": "The greatest apartment",
+    "rooms": [
+      {
+        "id": 1,
+        "name": "Room1",
+        "size": 50
+      }
+    ]
+  },
+  "booking_history": {
+    "apartment_id": "1",
+    "bookings": [
+      {
+        "id": 1,
+        "step": "start",
+        "booking_date_time": "2022-01-01T00:00:00+00:00",
+        "owner_id": "1",
+        "tenant_id": "tenantId",
+        "booking_start": "2022-02-01T00:00:00+00:00",
+        "booking_end": "2022-02-02T00:00:00+00:00"
+      }
+    ]
+  }
+}
