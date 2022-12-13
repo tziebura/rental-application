@@ -2,7 +2,7 @@
 
 namespace App\Application\Apartment;
 
- use App\Domain\Apartment\ApartmentFactory;
+ use App\Domain\Apartment\ApartmentBuilder;
  use App\Domain\Apartment\ApartmentRepository;
  use App\Domain\Apartment\BookingRepository;
  use App\Domain\Apartment\Period;
@@ -22,13 +22,19 @@ namespace App\Application\Apartment;
          $this->bookingRepository = $bookingRepository;
      }
 
-     public function add(
-        string $ownerId, string $street, string $postalCode, string $houseNumber, string $apartmentNumber, string $city,
-        string $country, string $description, array $roomsDefinition
-    ): void {
-        $factory = new ApartmentFactory();
-        $apartment = $factory->create(
-            $street, $postalCode, $houseNumber, $apartmentNumber, $city, $country, $roomsDefinition, $ownerId, $description);
+     public function add(ApartmentDTO $apartmentDTO): void
+     {
+        $apartment = ApartmentBuilder::create()
+            ->withStreet($apartmentDTO->getStreet())
+            ->withPostalCode($apartmentDTO->getPostalCode())
+            ->withHouseNumber($apartmentDTO->getHouseNumber())
+            ->withApartmentNumber($apartmentDTO->getApartmentNumber())
+            ->withCity($apartmentDTO->getCity())
+            ->withCountry($apartmentDTO->getCountry())
+            ->withRoomsDefinition($apartmentDTO->getRoomsDefinition())
+            ->withOwnerId($apartmentDTO->getOwnerId())
+            ->withDescription($apartmentDTO->getDescription())
+            ->build();
 
         $this->apartmentRepository->save($apartment);
     }

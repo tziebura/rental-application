@@ -3,7 +3,7 @@
 namespace App\Tests\Infrastructure\Persistence\Sql\Apartment;
 
 use App\Domain\Apartment\Apartment;
-use App\Domain\Apartment\ApartmentFactory;
+use App\Domain\Apartment\ApartmentBuilder;
 use App\Infrastructure\Persistence\Sql\Apartment\DoctrineOrmApartmentRepository;
 use App\Infrastructure\Persistence\Sql\Apartment\SqlApartmentRepository;
 use App\Tests\Domain\Apartment\ApartmentAssertion;
@@ -29,7 +29,6 @@ class SqlApartmentRepositoryIntegrationTest extends WebTestCase
 
     private SqlApartmentRepository $subject;
     private AbstractDatabaseTool $databaseTool;
-    private ApartmentFactory $factory;
 
     public function setUp(): void
     {
@@ -38,7 +37,6 @@ class SqlApartmentRepositoryIntegrationTest extends WebTestCase
         );
 
         $this->databaseTool = $this->getContainer()->get(DatabaseToolCollection::class)->get();
-        $this->factory = new ApartmentFactory();
     }
 
     /**
@@ -65,11 +63,41 @@ class SqlApartmentRepositoryIntegrationTest extends WebTestCase
      */
     public function shouldReturnExistingApartmentWeWant()
     {
-        $apartment = $this->factory->create("Florianska", "98-765", "12", "34", "Krakow", "Poland", ["Room1" => 50.0], "1234", "The greatest apartment");
+        $apartment = ApartmentBuilder::create()
+            ->withStreet("Florianska")
+            ->withPostalCode("98-765")
+            ->withHouseNumber("12")
+            ->withApartmentNumber("34")
+            ->withCity("Krakow")
+            ->withCountry("Poland")
+            ->withRoomsDefinition(["Room1" => 50.0])
+            ->withOwnerId("1234")
+            ->withDescription("The greatest apartment")
+            ->build();
         $this->subject->save($apartment);
-        $apartment = $this->factory->create("Florianska", "98-999", "10", "42", "Krakow", "Poland", ["Room42" => 100.0], "5692", "Great apartment");
+        $apartment = ApartmentBuilder::create()
+            ->withStreet("Florianska")
+            ->withPostalCode("98-999")
+            ->withHouseNumber("10")
+            ->withApartmentNumber("42")
+            ->withCity("Krakow")
+            ->withCountry("Poland")
+            ->withRoomsDefinition(["Room42" => 100.0])
+            ->withOwnerId("5692")
+            ->withDescription("Great apartment")
+            ->build();
         $this->subject->save($apartment);
-        $apartment = $this->factory->create("Florianska", "98-123", "11", "13", "Krakow", "Poland", ["Room13" => 30.0], "2083", "Not so bad apartment");
+        $apartment = ApartmentBuilder::create()
+            ->withStreet("Florianska")
+            ->withPostalCode("98-123")
+            ->withHouseNumber("11")
+            ->withApartmentNumber("13")
+            ->withCity("Krakow")
+            ->withCountry("Poland")
+            ->withRoomsDefinition(["Room13" => 30.0])
+            ->withOwnerId("2083")
+            ->withDescription("Not so bad apartment")
+            ->build();
         $this->subject->save($apartment);
 
         $actual = $this->subject->findById(self::EXISTING_ID);
@@ -83,16 +111,16 @@ class SqlApartmentRepositoryIntegrationTest extends WebTestCase
 
     private function createApartment(): Apartment
     {
-        return $this->factory->create(
-            self::STREET,
-            self::POSTAL_CODE,
-            self::HOUSE_NUMBER,
-            self::APARTMENT_NUMBER,
-            self::CITY,
-            self::COUNTRY,
-            self::ROOMS_DEFINITION,
-            self::OWNER_ID,
-            self::DESCRIPTION
-        );
+        return ApartmentBuilder::create()
+            ->withStreet(self::STREET)
+            ->withPostalCode(self::POSTAL_CODE)
+            ->withHouseNumber(self::HOUSE_NUMBER)
+            ->withApartmentNumber(self::APARTMENT_NUMBER)
+            ->withCity(self::CITY)
+            ->withCountry(self::COUNTRY)
+            ->withRoomsDefinition(self::ROOMS_DEFINITION)
+            ->withOwnerId(self::OWNER_ID)
+            ->withDescription(self::DESCRIPTION)
+            ->build();
     }
 }

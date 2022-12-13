@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Infrastructure\Web\Rest\Api\Apartment;
+namespace App\Application\Apartment;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

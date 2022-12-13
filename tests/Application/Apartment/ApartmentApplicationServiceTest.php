@@ -3,8 +3,9 @@
 namespace App\Tests\Application\Apartment;
 
 use App\Application\Apartment\ApartmentApplicationService;
+use App\Application\Apartment\ApartmentDTO;
 use App\Domain\Apartment\Apartment;
-use App\Domain\Apartment\ApartmentFactory;
+use App\Domain\Apartment\ApartmentBuilder;
 use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\Apartment\Booking;
 use App\Domain\Apartment\BookingRepository;
@@ -68,7 +69,7 @@ class ApartmentApplicationServiceTest extends TestCase
                 $actual = $apartment;
             }));
 
-        $this->subject->add(
+        $dto = new ApartmentDTO(
             self::OWNER_ID,
             self::STREET,
             self::POSTAL_CODE,
@@ -79,6 +80,7 @@ class ApartmentApplicationServiceTest extends TestCase
             self::DESCRIPTION,
             self::ROOMS_DEFINITION
         );
+        $this->subject->add($dto);
 
         ApartmentAssertion::assertThat($actual)
             ->hasOwnerEqualTo(self::OWNER_ID)
@@ -108,17 +110,17 @@ class ApartmentApplicationServiceTest extends TestCase
 
     private function givenApartment()
     {
-        $apartment = (new ApartmentFactory())->create(
-            self::STREET,
-            self::POSTAL_CODE,
-            self::HOUSE_NUMBER,
-            self::APARTMENT_NUMBER,
-            self::CITY,
-            self::COUNTRY,
-            self::ROOMS_DEFINITION,
-            self::OWNER_ID,
-            self::DESCRIPTION
-        );
+        $apartment = ApartmentBuilder::create()
+            ->withStreet(self::STREET)
+            ->withPostalCode(self::POSTAL_CODE)
+            ->withHouseNumber(self::HOUSE_NUMBER)
+            ->withApartmentNumber(self::APARTMENT_NUMBER)
+            ->withCity(self::CITY)
+            ->withCountry(self::COUNTRY)
+            ->withRoomsDefinition(self::ROOMS_DEFINITION)
+            ->withOwnerId(self::OWNER_ID)
+            ->withDescription(self::DESCRIPTION)
+            ->build();
         $this->setByReflection($apartment, 'id', self::APARTMENT_ID);
 
         $this->apartmentRepository->expects($this->once())

@@ -4,7 +4,7 @@ namespace App\Tests\Domain\Apartment;
 
 use App\Domain\Apartment\Apartment;
 use App\Domain\Apartment\ApartmentBooked;
-use App\Domain\Apartment\ApartmentFactory;
+use App\Domain\Apartment\ApartmentBuilder;
 use App\Domain\Apartment\Period;
 use App\Domain\EventChannel\EventChannel;
 use App\Tests\PrivatePropertyManipulator;
@@ -108,16 +108,16 @@ class ApartmentTest extends TestCase
 
     private function createApartment(): Apartment
     {
-        return (new ApartmentFactory())->create(
-            self::STREET,
-            self::POSTAL_CODE,
-            self::HOUSE_NUMBER,
-            self::APARTMENT_NUMBER,
-            self::CITY,
-            self::COUNTRY,
-            self::ROOMS_DEFINITION,
-            self::OWNER_ID,
-            self::DESCRIPTION
-        );
+        return ApartmentBuilder::create()
+            ->withStreet(self::STREET)
+            ->withPostalCode(self::POSTAL_CODE)
+            ->withHouseNumber(self::HOUSE_NUMBER)
+            ->withApartmentNumber(self::APARTMENT_NUMBER)
+            ->withCity(self::CITY)
+            ->withCountry(self::COUNTRY)
+            ->withRoomsDefinition(self::ROOMS_DEFINITION)
+            ->withOwnerId(self::OWNER_ID)
+            ->withDescription(self::DESCRIPTION)
+            ->build();
     }
 }
