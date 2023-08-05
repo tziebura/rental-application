@@ -3,10 +3,9 @@
 namespace App\Tests\Domain\Apartment;
 
 use App\Domain\Apartment\Apartment;
-use App\Domain\Apartment\ApartmentBooked;
 use App\Domain\Apartment\ApartmentBuilder;
+use App\Domain\Apartment\ApartmentEventsPublisher;
 use App\Domain\Apartment\Period;
-use App\Domain\EventChannel\EventChannel;
 use App\Tests\PrivatePropertyManipulator;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
@@ -30,11 +29,11 @@ class ApartmentTest extends TestCase
     private const DESCRIPTION = 'description';
     private const TENANT_ID = '1';
 
-    private EventChannel $eventChannel;
+    private ApartmentEventsPublisher $apartmentEventsPublisher;
 
     public function setUp(): void
     {
-        $this->eventChannel = $this->createMock(EventChannel::class);
+        $this->apartmentEventsPublisher = $this->createMock(ApartmentEventsPublisher::class);
     }
 
     /**
@@ -65,7 +64,7 @@ class ApartmentTest extends TestCase
         $actual = $apartment->book(
             self::TENANT_ID,
             $period,
-            $this->eventChannel
+            $this->apartmentEventsPublisher
         );
 
         BookingAssertion::assertThat($actual)
@@ -87,22 +86,19 @@ class ApartmentTest extends TestCase
         $apartment = $this->createApartment();
         $this->setByReflection($apartment, 'id', self::APARTMENT_ID);
 
-        $this->eventChannel->expects($this->once())
-            ->method('publish')
-            ->will($this->returnCallback(function (ApartmentBooked $actual) use ($start, $end) {
-                $this->assertMatchesRegularExpression('/[0-9a-z\\-]{36}/', $actual->getEventId());
-                $this->assertEqualsWithDelta((new DateTimeImmutable())->getTimestamp(), $actual->getEventCreationDateTime()->getTimestamp(), 1);
-                $this->assertEquals(self::APARTMENT_ID, $actual->getId());
-                $this->assertEquals(self::OWNER_ID, $actual->getOwnerId());
-                $this->assertEquals(self::TENANT_ID, $actual->getTenantId());
-                $this->assertEquals($start, $actual->getPeriodStart());
-                $this->assertEquals($end, $actual->getPeriodEnd());
-            }));
+        $this->apartmentEventsPublisher->expects($this->once())
+            ->method('publishApartmentBooked')
+            ->with(
+                self::APARTMENT_ID,
+                self::OWNER_ID,
+                self::TENANT_ID,
+                new Period($start, $end)
+            );
 
         $apartment->book(
             self::TENANT_ID,
             $period,
-            $this->eventChannel
+            $this->apartmentEventsPublisher
         );
     }
 

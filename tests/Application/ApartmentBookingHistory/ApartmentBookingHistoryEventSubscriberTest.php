@@ -9,6 +9,8 @@ use App\Domain\ApartmentBookingHistory\ApartmentBooking;
 use App\Domain\ApartmentBookingHistory\ApartmentBookingHistory;
 use App\Domain\ApartmentBookingHistory\ApartmentBookingHistoryRepository;
 use App\Domain\ApartmentBookingHistory\BookingPeriod;
+use App\Domain\Event\EventCreationTimeFactory;
+use App\Domain\Event\EventIdFactory;
 use App\Domain\HotelBookingHistory\BookingStep;
 use App\Tests\Domain\ApartmentBookingHistory\ApartmentBookingHistoryAssertion;
 use DateTimeImmutable;
@@ -111,7 +113,9 @@ class ApartmentBookingHistoryEventSubscriberTest extends TestCase
 
     private function givenApartmentBooked(): ApartmentBooked
     {
-        return ApartmentBooked::create(
+        return new ApartmentBooked(
+            (new EventIdFactory())->create(),
+        (new EventCreationTimeFactory())->create(),
             self::APARTMENT_ID,
             self::OWNER_ID,
             self::TENANT_ID,

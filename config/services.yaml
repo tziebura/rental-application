@@ -21,3 +21,14 @@ services:
             - '@serializer'
         tags:
             - { name: controller.request_value_resolver, priority: 50 }
+
+    app.event.event_id_factory:
+        class: App\Domain\Event\EventIdFactory
+    app.event.event_creation_time_factory:
+        class: App\Domain\Event\EventCreationTimeFactory
+
+    App\Domain\Apartment\ApartmentEventsPublisher:
+        arguments:
+            - '@app.event.event_id_factory'
+            - '@app.event.event_creation_time_factory'
+            - '@App\Domain\EventChannel\EventChannel'

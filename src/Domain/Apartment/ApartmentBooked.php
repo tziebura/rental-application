@@ -15,7 +15,7 @@ class ApartmentBooked
     private DateTimeImmutable $periodStart;
     private DateTimeImmutable $periodEnd;
 
-    private function __construct(string $eventId, DateTimeImmutable $eventCreationDateTime, int $id, string $ownerId, string $tenantId, Period $period)
+    public function __construct(string $eventId, DateTimeImmutable $eventCreationDateTime, int $id, string $ownerId, string $tenantId, Period $period)
     {
         $this->eventId = $eventId;
         $this->eventCreationDateTime = $eventCreationDateTime;
@@ -24,21 +24,6 @@ class ApartmentBooked
         $this->tenantId = $tenantId;
         $this->periodStart = $period->getStart();
         $this->periodEnd = $period->getEnd();
-    }
-
-    public static function create(int $apartmentId, string $ownerId, string $tenantId, Period $period): ApartmentBooked
-    {
-        $eventId = Uuid::uuid4()->toString();
-        $eventCreationDateTime = new DateTimeImmutable();
-
-        return new self(
-            $eventId,
-            $eventCreationDateTime,
-            $apartmentId,
-            $ownerId,
-            $tenantId,
-            $period
-        );
     }
 
     public function getEventId(): string

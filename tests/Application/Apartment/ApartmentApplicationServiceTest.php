@@ -6,10 +6,11 @@ use App\Application\Apartment\ApartmentApplicationService;
 use App\Application\Apartment\ApartmentDTO;
 use App\Domain\Apartment\Apartment;
 use App\Domain\Apartment\ApartmentBuilder;
+use App\Domain\Apartment\ApartmentEventsPublisher;
 use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\Apartment\Booking;
 use App\Domain\Apartment\BookingRepository;
-use App\Domain\EventChannel\EventChannel;
+use App\Domain\Apartment\Period;
 use App\Tests\Domain\Apartment\ApartmentAssertion;
 use App\Tests\Domain\Apartment\BookingAssertion;
 use App\Tests\PrivatePropertyManipulator;
@@ -36,7 +37,7 @@ class ApartmentApplicationServiceTest extends TestCase
     private const TENANT_ID = '1';
 
     private ApartmentRepository $apartmentRepository;
-    private EventChannel $eventChannel;
+    private ApartmentEventsPublisher $apartmentEventsPublisher;
     private BookingRepository $bookingRepository;
     private ApartmentApplicationService $subject;
     private DateTimeImmutable $start;
@@ -46,14 +47,14 @@ class ApartmentApplicationServiceTest extends TestCase
     public function setUp(): void
     {
         $this->apartmentRepository = $this->createMock(ApartmentRepository::class);
-        $this->eventChannel = $this->createMock(EventChannel::class);
+        $this->apartmentEventsPublisher = $this->createMock(ApartmentEventsPublisher::class);
         $this->bookingRepository = $this->createMock(BookingRepository::class);
         $this->start = new DateTimeImmutable('01-01-2022');
         $this->end = new DateTimeImmutable('02-01-2022');
 
         $this->subject = new ApartmentApplicationService(
             $this->apartmentRepository,
-            $this->eventChannel,
+            $this->apartmentEventsPublisher,
             $this->bookingRepository
         );
     }
@@ -108,6 +109,16 @@ class ApartmentApplicationServiceTest extends TestCase
         $this->thenBookingShouldBeCreated();
     }
 
+    /**
+     * @test
+     */
+    public function shouldPublishApartmentBookedEvent(): void
+    {
+        $this->givenApartment();
+        $this->thenShouldPublishApartmentBookedEvent();
+        $this->subject->book(self::APARTMENT_ID, self::TENANT_ID, $this->start, $this->end);
+    }
+
     private function givenApartment()
     {
         $apartment = ApartmentBuilder::create()
@@ -145,5 +156,17 @@ class ApartmentApplicationServiceTest extends TestCase
             ->isApartmentBooking()
             ->hasTenantIdEqualTo(self::TENANT_ID)
             ->hasRentalPlaceIdEqualTo(self::APARTMENT_ID);
+    }
+
+    private function thenShouldPublishApartmentBookedEvent(): void
+    {
+        $this->apartmentEventsPublisher->expects($this->once())
+            ->method('publishApartmentBooked')
+            ->with(
+                self::APARTMENT_ID,
+                self::OWNER_ID,
+                self::TENANT_ID,
+                new Period($this->start, $this->end)
+            );
     }
 }
