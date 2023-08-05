@@ -3,6 +3,8 @@
 namespace App\Tests\Application\HotelBookingHistory;
 
 use App\Application\HotelBookingHistory\HotelRoomBookingHistoryEventSubscriber;
+use App\Domain\Event\EventCreationTimeFactory;
+use App\Domain\Event\EventIdFactory;
 use App\Domain\HotelBookingHistory\BookingStep;
 use App\Domain\HotelBookingHistory\HotelBookingHistory;
 use App\Domain\HotelBookingHistory\HotelBookingHistoryRepository;
@@ -98,7 +100,9 @@ class HotelRoomBookingHistoryEventSubscriberTest extends TestCase
 
     private function givenHotelRoomBooked(): HotelRoomBooked
     {
-        return HotelRoomBooked::create(
+        return new HotelRoomBooked(
+            (new EventIdFactory())->create(),
+            (new EventCreationTimeFactory())->create(),
             self::HOTEL_ROOM_ID,
             self::HOTEL_ID,
             $this->days,

@@ -52,16 +52,14 @@ class HotelRoom
         }, $rooms));
     }
 
-    public function book(array $days, string $tenantId, EventChannel $eventChannel)
+    public function book(array $days, string $tenantId, HotelRoomEventsPublisher $hotelRoomEventsPublisher): Booking
     {
-        $event = HotelRoomBooked::create(
+        $hotelRoomEventsPublisher->publishHotelRoomBooked(
             $this->id,
             $this->hotelId,
             $days,
             $tenantId
         );
-
-        $eventChannel->publish($event);
 
         return Booking::hotelRoom(
             $this->id,

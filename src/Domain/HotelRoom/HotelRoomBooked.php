@@ -24,22 +24,6 @@ class HotelRoomBooked
         $this->tenantId = $tenantId;
     }
 
-
-    public static function create(int $id, string $hotelId, array $days, string $tenantId): HotelRoomBooked
-    {
-        $eventId = Uuid::uuid4()->toString();
-        $eventCreationDateTime = new DateTimeImmutable();
-
-        return new self(
-            $eventId,
-            $eventCreationDateTime,
-            $id,
-            $hotelId,
-            $days,
-            $tenantId
-        );
-    }
-
     public function getEventId(): string
     {
         return $this->eventId;

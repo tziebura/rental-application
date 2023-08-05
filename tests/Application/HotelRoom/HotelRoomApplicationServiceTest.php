@@ -5,13 +5,14 @@ namespace App\Tests\Application\HotelRoom;
 use App\Application\HotelRoom\HotelRoomApplicationService;
 use App\Domain\Apartment\Booking;
 use App\Domain\Apartment\BookingRepository;
-use App\Domain\EventChannel\EventChannel;
 use App\Domain\HotelRoom\HotelRoom;
+use App\Domain\HotelRoom\HotelRoomEventsPublisher;
 use App\Domain\HotelRoom\HotelRoomFactory;
 use App\Domain\HotelRoom\HotelRoomRepository;
 use App\Tests\Domain\Apartment\BookingAssertion;
 use App\Tests\Domain\HotelRoom\HotelRoomAssertion;
 use App\Tests\PrivatePropertyManipulator;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class HotelRoomApplicationServiceTest extends TestCase
@@ -19,33 +20,34 @@ class HotelRoomApplicationServiceTest extends TestCase
     use PrivatePropertyManipulator;
 
     private const TENANT_ID = '1';
-    const HOTEL_ID = 'hotelId';
-    const ROOM_NUMBER = 1;
-    const DESCRIPTION = 'description';
-    const ROOMS = [
+    private const HOTEL_ID = 'hotelId';
+    private const ROOM_NUMBER = 1;
+    private const DESCRIPTION = 'description';
+    private const ROOMS = [
         'living_room' => 20.0,
         'kitchen' => 10.0,
         'bedroom' => 25.5,
         'bathroom' => 15.2
     ];
+    private const HOTEL_ROOM_ID = '1';
     private array $days;
 
     private HotelRoomApplicationService $subject;
     private HotelRoomRepository $hotelRoomRepository;
-    private EventChannel $eventChannel;
+    private HotelRoomEventsPublisher $hotelRoomEventsPublisher;
     private BookingRepository $bookingRepository;
     private Booking $actual;
 
     public function setUp(): void
     {
-        $this->days = [new \DateTimeImmutable('01-01-2022'), new \DateTimeImmutable('02-01-2022')];
+        $this->days = [new DateTimeImmutable('01-01-2022'), new DateTimeImmutable('02-01-2022')];
         $this->hotelRoomRepository = $this->createMock(HotelRoomRepository::class);
-        $this->eventChannel = $this->createMock(EventChannel::class);
+        $this->hotelRoomEventsPublisher = $this->createMock(HotelRoomEventsPublisher::class);
         $this->bookingRepository = $this->createMock(BookingRepository::class);
 
         $this->subject = new HotelRoomApplicationService(
             $this->hotelRoomRepository,
-            $this->eventChannel,
+            $this->hotelRoomEventsPublisher,
             $this->bookingRepository
         );
     }
@@ -53,7 +55,7 @@ class HotelRoomApplicationServiceTest extends TestCase
     /**
      * @test
      */
-    public function shouldAddHotelRoomWithAllInformation()
+    public function shouldAddHotelRoomWithAllInformation(): void
     {
         $this->hotelRoomRepository->expects($this->once())
             ->method('save')
@@ -79,15 +81,22 @@ class HotelRoomApplicationServiceTest extends TestCase
     /**
      * @test
      */
-    public function shouldCreateBookingWhenHotelRoomBooked()
+    public function shouldCreateBookingWhenHotelRoomBooked(): void
     {
-        $hotelRoomId = '1';
-        $this->givenHotelRoom($hotelRoomId);
+        $this->givenHotelRoom(self::HOTEL_ROOM_ID);
 
         $this->thenBookingWillBeSaved();
-        $this->subject->book($hotelRoomId, $this->days, self::TENANT_ID);
+        $this->subject->book(self::HOTEL_ROOM_ID, $this->days, self::TENANT_ID);
 
         $this->thenBookingShouldBeCreated();
+    }
+
+    public function shouldPublishHotelRoomBookedEvent(): void
+    {
+        $this->givenHotelRoom(self::HOTEL_ROOM_ID);
+
+        $this->thenHotelRoomBookedEventShouldBePublished();
+        $this->subject->book(self::HOTEL_ROOM_ID, $this->days, self::TENANT_ID);
     }
 
     private function givenHotelRoom(string $hotelRoomId): void
@@ -122,5 +131,17 @@ class HotelRoomApplicationServiceTest extends TestCase
             ->isHotelRoomBooking()
             ->hasTenantIdEqualTo(self::TENANT_ID)
             ->hasDaysEqualTo($this->days);
+    }
+
+    private function thenHotelRoomBookedEventShouldBePublished(): void
+    {
+        $this->hotelRoomEventsPublisher->expects($this->once())
+            ->method('publishHotelRoomBooked')
+            ->with(
+                self::HOTEL_ROOM_ID,
+                self::HOTEL_ID,
+                $this->days,
+                self::TENANT_ID
+            );
     }
 }

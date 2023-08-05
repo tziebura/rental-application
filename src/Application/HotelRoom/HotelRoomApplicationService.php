@@ -4,19 +4,23 @@ namespace App\Application\HotelRoom;
 
 use App\Domain\Apartment\BookingRepository;
 use App\Domain\EventChannel\EventChannel;
+use App\Domain\HotelRoom\HotelRoomEventsPublisher;
 use App\Domain\HotelRoom\HotelRoomFactory;
 use App\Domain\HotelRoom\HotelRoomRepository;
 
 class HotelRoomApplicationService
 {
     private HotelRoomRepository $hotelRoomRepository;
-    private EventChannel $eventChannel;
+    private HotelRoomEventsPublisher $hotelRoomEventsPublisher;
     private BookingRepository $bookingRepository;
 
-    public function __construct(HotelRoomRepository $hotelRoomRepository, EventChannel $eventChannel, BookingRepository $bookingRepository)
-    {
+    public function __construct(
+        HotelRoomRepository $hotelRoomRepository,
+        HotelRoomEventsPublisher $hotelRoomEventsPublisher,
+        BookingRepository $bookingRepository
+    ) {
         $this->hotelRoomRepository = $hotelRoomRepository;
-        $this->eventChannel = $eventChannel;
+        $this->hotelRoomEventsPublisher = $hotelRoomEventsPublisher;
         $this->bookingRepository = $bookingRepository;
     }
 
@@ -33,7 +37,7 @@ class HotelRoomApplicationService
     public function book(string $id, array $days, string $tenantId)
     {
         $hotelRoom = $this->hotelRoomRepository->findById($id);
-        $booking = $hotelRoom->book($days, $tenantId, $this->eventChannel);
+        $booking = $hotelRoom->book($days, $tenantId, $this->hotelRoomEventsPublisher);
 
         $this->bookingRepository->save($booking);
     }
