@@ -38,3 +38,9 @@ services:
             - '@app.event.event_id_factory'
             - '@app.event.event_creation_time_factory'
             - '@App\Domain\EventChannel\EventChannel'
+
+    App\Domain\Booking\BookingEventsPublisher:
+        arguments:
+            - '@app.event.event_id_factory'
+            - '@app.event.event_creation_time_factory'
+            - '@App\Domain\EventChannel\EventChannel'

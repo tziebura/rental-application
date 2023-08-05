@@ -5,6 +5,7 @@ namespace App\Tests\Domain\Booking;
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingAccepted;
 use App\Domain\Apartment\Period;
+use App\Domain\Booking\BookingEventsPublisher;
 use App\Domain\Booking\RentalType;
 use App\Domain\EventChannel\EventChannel;
 use App\Tests\Domain\Booking\BookingAssertion;
@@ -17,11 +18,11 @@ class BookingTest extends TestCase
     private const TENANT_ID = 'tenantId';
 
     private Period $period;
-    private EventChannel $eventChannel;
+    private BookingEventsPublisher $bookingEventsPublisher;
 
     public function setUp(): void
     {
-        $this->eventChannel = $this->createMock(EventChannel::class);
+        $this->bookingEventsPublisher = $this->createMock(BookingEventsPublisher::class);
         $this->period = new Period(
             new DateTimeImmutable('01-01-2022'),
             new DateTimeImmutable('08-01-2022')
@@ -80,7 +81,7 @@ class BookingTest extends TestCase
     public function shouldAcceptBooking()
     {
         $actual = $this->givenHotelRoomBooking();
-        $actual->accept($this->eventChannel);
+        $actual->accept($this->bookingEventsPublisher);
 
         BookingAssertion::assertThat($actual)
             ->isAccepted();
@@ -93,18 +94,16 @@ class BookingTest extends TestCase
     {
         $actual = $this->givenHotelRoomBooking();
 
-        $this->eventChannel->expects($this->once())
-            ->method('publish')
-            ->will($this->returnCallback(function (BookingAccepted $actual) {
-                $this->assertMatchesRegularExpression('/[0-9a-z\\-]{36}/', $actual->getEventId());
-                $this->assertEqualsWithDelta((new DateTimeImmutable())->getTimestamp(), $actual->getEventCreationDateTime()->getTimestamp(), 1);
-                $this->assertEquals(RentalType::HOTEL_ROOM, $actual->getRentalType());
-                $this->assertEquals(self::RENTAL_PLACE_ID, $actual->getRentalPlaceId());
-                $this->assertEquals(self::TENANT_ID, $actual->getTenantId());
-                $this->assertEquals($this->period->asDays(), $actual->getDates());
-            }));
+        $this->bookingEventsPublisher->expects($this->once())
+            ->method('publishBookingAccepted')
+            ->with(
+                RentalType::HOTEL_ROOM,
+                self::RENTAL_PLACE_ID,
+                self::TENANT_ID,
+                $this->period->asDays()
+            );
 
-        $actual->accept($this->eventChannel);
+        $actual->accept($this->bookingEventsPublisher);
     }
 
     public function givenHotelRoomBooking(): Booking

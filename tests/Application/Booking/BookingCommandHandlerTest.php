@@ -6,6 +6,7 @@ use App\Application\Booking\AcceptBooking;
 use App\Application\Booking\BookingCommandHandler;
 use App\Application\Booking\RejectBooking;
 use App\Domain\Booking\Booking;
+use App\Domain\Booking\BookingEventsPublisher;
 use App\Domain\Booking\BookingRepository;
 use App\Domain\EventChannel\EventChannel;
 use App\Tests\Domain\Booking\BookingAssertion;
@@ -14,27 +15,30 @@ use PHPUnit\Framework\TestCase;
 class BookingCommandHandlerTest extends TestCase
 {
     const BOOKING_ID = '1';
+    const RENTAL_TYPE = 'hotel_room';
+    const RENTAL_PLACE_ID = 1;
+    const TENANT_ID = 'tenantId';
 
     private BookingRepository $repository;
-    private EventChannel $eventChannel;
+    private BookingEventsPublisher $bookingEventsPublisher;
     private BookingCommandHandler $subject;
     private Booking $actual;
 
     public function setUp(): void
     {
         $this->repository = $this->createMock(BookingRepository::class);
-        $this->eventChannel = $this->createMock(EventChannel::class);
+        $this->bookingEventsPublisher = $this->createMock(BookingEventsPublisher::class);
 
         $this->subject = new BookingCommandHandler(
             $this->repository,
-            $this->eventChannel
+            $this->bookingEventsPublisher
         );
     }
 
     /**
      * @test
      */
-    public function shouldSubscribeEvents()
+    public function shouldSubscribeToEvents(): void
     {
         $expectedEvents = [
             RejectBooking::class => ['reject'],
@@ -47,7 +51,7 @@ class BookingCommandHandlerTest extends TestCase
     /**
      * @test
      */
-    public function shouldRejectBooking()
+    public function shouldRejectBooking(): void
     {
         $this->givenBooking();
         $command = $this->givenRejectBookingCommand();
@@ -62,7 +66,7 @@ class BookingCommandHandlerTest extends TestCase
         return new RejectBooking(self::BOOKING_ID);
     }
 
-    private function thenBookingShouldBeRejected()
+    private function thenBookingShouldBeRejected(): void
     {
         BookingAssertion::assertThat($this->actual)
             ->isRejected();
@@ -71,7 +75,7 @@ class BookingCommandHandlerTest extends TestCase
     /**
      * @test
      */
-    public function shouldAcceptBooking()
+    public function shouldAcceptBooking(): void
     {
         $this->givenBooking();
         $command = $this->givenAcceptBookingCommand();
@@ -81,12 +85,20 @@ class BookingCommandHandlerTest extends TestCase
         $this->thenBookingShouldBeAccepted();
     }
 
-    private function givenAcceptBookingCommand()
+    public function shouldPublishBookingAcceptedEvent(): void
+    {
+        $this->givenBooking();
+        $command = $this->givenAcceptBookingCommand();
+        $this->thenBookingAcceptedEventShouldBePublished();
+        $this->subject->accept($command);
+    }
+
+    private function givenAcceptBookingCommand(): AcceptBooking
     {
         return new AcceptBooking(self::BOOKING_ID);
     }
 
-    private function thenBookingShouldBeAccepted()
+    private function thenBookingShouldBeAccepted(): void
     {
         BookingAssertion::assertThat($this->actual)
             ->isAccepted();
@@ -95,9 +107,9 @@ class BookingCommandHandlerTest extends TestCase
     private function givenBooking(): void
     {
         $booking = new Booking(
-            1,
-            'tenantId',
-            'hotel_room',
+            self::RENTAL_PLACE_ID,
+            self::TENANT_ID,
+            self::RENTAL_TYPE,
             []
         );
 
@@ -114,5 +126,17 @@ class BookingCommandHandlerTest extends TestCase
             ->will($this->returnCallback(function (Booking $booking) {
                 $this->actual = $booking;
             }));
+    }
+
+    private function thenBookingAcceptedEventShouldBePublished(): void
+    {
+        $this->bookingEventsPublisher->expects($this->once())
+            ->method('publishBookingAccepted')
+            ->with(
+                self::RENTAL_TYPE,
+                self::RENTAL_PLACE_ID,
+                self::TENANT_ID,
+                []
+            );
     }
 }

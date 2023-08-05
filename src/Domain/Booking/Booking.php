@@ -78,17 +78,15 @@ class Booking
         $this->status = BookingStatus::REJECTED;
     }
 
-    public function accept(EventChannel $eventChannel)
+    public function accept(BookingEventsPublisher $bookingEventsPublisher)
     {
         $this->status = BookingStatus::ACCEPTED;
 
-        $event = BookingAccepted::create(
+        $bookingEventsPublisher->publishBookingAccepted(
             $this->rentalType,
             $this->rentalPlaceId,
             $this->tenantId,
             $this->dates
         );
-
-        $eventChannel->publish($event);
     }
 }

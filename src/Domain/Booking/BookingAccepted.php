@@ -14,7 +14,7 @@ class BookingAccepted
     private string $tenantId;
     private array $dates;
 
-    private function __construct(string $eventId, DateTimeImmutable $eventCreationDateTime, string $rentalType, int $rentalPlaceId, string $tenantId, array $dates)
+    public function __construct(string $eventId, DateTimeImmutable $eventCreationDateTime, string $rentalType, int $rentalPlaceId, string $tenantId, array $dates)
     {
         $this->eventId = $eventId;
         $this->eventCreationDateTime = $eventCreationDateTime;
@@ -22,18 +22,6 @@ class BookingAccepted
         $this->rentalPlaceId = $rentalPlaceId;
         $this->tenantId = $tenantId;
         $this->dates = $dates;
-    }
-
-    public static function create(string $rentalType, int $rentalPlaceId, string $tenantId, array $dates): self
-    {
-        return new self(
-            Uuid::uuid4()->toString(),
-            new DateTimeImmutable(),
-            $rentalType,
-            $rentalPlaceId,
-            $tenantId,
-            $dates
-        );
     }
 
     public function getEventId(): string
