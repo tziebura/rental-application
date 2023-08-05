@@ -5,7 +5,7 @@ namespace App\Application\Apartment;
  use App\Domain\Apartment\ApartmentBuilder;
  use App\Domain\Apartment\ApartmentEventsPublisher;
  use App\Domain\Apartment\ApartmentRepository;
- use App\Domain\Apartment\BookingRepository;
+ use App\Domain\Booking\BookingRepository;
  use App\Domain\Apartment\Period;
  use DateTimeImmutable;
 

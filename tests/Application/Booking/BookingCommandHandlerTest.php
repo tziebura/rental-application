@@ -5,10 +5,10 @@ namespace App\Tests\Application\Booking;
 use App\Application\Booking\AcceptBooking;
 use App\Application\Booking\BookingCommandHandler;
 use App\Application\Booking\RejectBooking;
-use App\Domain\Apartment\Booking;
-use App\Domain\Apartment\BookingRepository;
+use App\Domain\Booking\Booking;
+use App\Domain\Booking\BookingRepository;
 use App\Domain\EventChannel\EventChannel;
-use App\Tests\Domain\Apartment\BookingAssertion;
+use App\Tests\Domain\Booking\BookingAssertion;
 use PHPUnit\Framework\TestCase;
 
 class BookingCommandHandlerTest extends TestCase

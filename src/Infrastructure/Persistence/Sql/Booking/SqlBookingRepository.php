@@ -2,8 +2,8 @@
 
 namespace App\Infrastructure\Persistence\Sql\Booking;
 
-use App\Domain\Apartment\Booking;
-use App\Domain\Apartment\BookingRepository;
+use App\Domain\Booking\Booking;
+use App\Domain\Booking\BookingRepository;
 
 class SqlBookingRepository implements BookingRepository
 {

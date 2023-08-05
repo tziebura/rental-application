@@ -6,6 +6,7 @@ use App\Domain\Apartment\Apartment;
 use App\Domain\Apartment\ApartmentBuilder;
 use App\Domain\Apartment\ApartmentEventsPublisher;
 use App\Domain\Apartment\Period;
+use App\Tests\Domain\Booking\BookingAssertion;
 use App\Tests\PrivatePropertyManipulator;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;

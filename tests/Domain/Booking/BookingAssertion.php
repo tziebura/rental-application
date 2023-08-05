@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Tests\Domain\Apartment;
+namespace App\Tests\Domain\Booking;
 
-use App\Domain\Apartment\Booking;
-use App\Domain\Apartment\BookingStatus;
-use App\Domain\Apartment\RentalType;
+use App\Domain\Booking\Booking;
+use App\Domain\Booking\BookingStatus;
+use App\Domain\Booking\RentalType;
 use App\Tests\PrivatePropertyManipulator;
 use PHPUnit\Framework\TestCase;
 

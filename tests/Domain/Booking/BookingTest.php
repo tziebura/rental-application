@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Tests\Domain\Apartment;
+namespace App\Tests\Domain\Booking;
 
-use App\Domain\Apartment\Booking;
-use App\Domain\Apartment\BookingAccepted;
+use App\Domain\Booking\Booking;
+use App\Domain\Booking\BookingAccepted;
 use App\Domain\Apartment\Period;
-use App\Domain\Apartment\RentalType;
+use App\Domain\Booking\RentalType;
 use App\Domain\EventChannel\EventChannel;
+use App\Tests\Domain\Booking\BookingAssertion;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 

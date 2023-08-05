@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Persistence\Sql\Booking;
 
-use App\Domain\Apartment\Booking;
+use App\Domain\Booking\Booking;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

@@ -2,7 +2,7 @@
 
 namespace App\Application\Booking;
 
-use App\Domain\Apartment\BookingRepository;
+use App\Domain\Booking\BookingRepository;
 use App\Domain\EventChannel\EventChannel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

@@ -3,13 +3,13 @@
 namespace App\Tests\Application\HotelRoom;
 
 use App\Application\HotelRoom\HotelRoomApplicationService;
-use App\Domain\Apartment\Booking;
-use App\Domain\Apartment\BookingRepository;
+use App\Domain\Booking\Booking;
+use App\Domain\Booking\BookingRepository;
 use App\Domain\HotelRoom\HotelRoom;
 use App\Domain\HotelRoom\HotelRoomEventsPublisher;
 use App\Domain\HotelRoom\HotelRoomFactory;
 use App\Domain\HotelRoom\HotelRoomRepository;
-use App\Tests\Domain\Apartment\BookingAssertion;
+use App\Tests\Domain\Booking\BookingAssertion;
 use App\Tests\Domain\HotelRoom\HotelRoomAssertion;
 use App\Tests\PrivatePropertyManipulator;
 use DateTimeImmutable;

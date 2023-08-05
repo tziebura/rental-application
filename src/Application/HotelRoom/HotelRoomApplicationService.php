@@ -2,7 +2,7 @@
 
 namespace App\Application\HotelRoom;
 
-use App\Domain\Apartment\BookingRepository;
+use App\Domain\Booking\BookingRepository;
 use App\Domain\EventChannel\EventChannel;
 use App\Domain\HotelRoom\HotelRoomEventsPublisher;
 use App\Domain\HotelRoom\HotelRoomFactory;

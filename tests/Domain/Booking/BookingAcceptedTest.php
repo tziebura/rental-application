@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Tests\Domain\Apartment;
+namespace App\Tests\Domain\Booking;
 
-use App\Domain\Apartment\BookingAccepted;
-use App\Domain\Apartment\RentalType;
+use App\Domain\Booking\BookingAccepted;
+use App\Domain\Booking\RentalType;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 

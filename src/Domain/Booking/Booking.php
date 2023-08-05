@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Domain\Apartment;
+namespace App\Domain\Booking;
 
+use App\Domain\Apartment\Period;
 use App\Domain\EventChannel\EventChannel;
 use Doctrine\ORM\Mapping as ORM;
 

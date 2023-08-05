@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Apartment;
+namespace App\Domain\Booking;
 
 use DateTimeImmutable;
 use Ramsey\Uuid\Uuid;

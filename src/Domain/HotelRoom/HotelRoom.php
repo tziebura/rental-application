@@ -2,7 +2,7 @@
 
 namespace App\Domain\HotelRoom;
 
-use App\Domain\Apartment\Booking;
+use App\Domain\Booking\Booking;
 use App\Domain\EventChannel\EventChannel;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
