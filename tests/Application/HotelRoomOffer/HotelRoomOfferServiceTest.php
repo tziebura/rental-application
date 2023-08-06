@@ -11,13 +11,20 @@ use PHPUnit\Framework\TestCase;
 
 class HotelRoomOfferServiceTest extends TestCase
 {
+    const HOTEL_ROOM_ID = '1';
+    const PRICE = 10.0;
     private HotelRoomOfferRepository $hotelRoomOfferRepository;
+    private DateTimeImmutable $start;
+    private DateTimeImmutable $end;
 
     private HotelRoomOfferService $subject;
 
     public function setUp(): void
     {
         $this->hotelRoomOfferRepository = $this->createMock(HotelRoomOfferRepository::class);
+
+        $this->start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
+        $this->end = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
 
         $this->subject = new HotelRoomOfferService(
             $this->hotelRoomOfferRepository
@@ -31,13 +38,8 @@ class HotelRoomOfferServiceTest extends TestCase
     {
         $this->givenHotelRoomExists();
 
-        $hotelRoomId = '1';
-        $price = 10.0;
-        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
-        $end = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
-
-        $this->thenHotelRoomShouldBeSaved($hotelRoomId, $price, $start, $end);
-        $this->subject->add($hotelRoomId, $price, $start, $end);
+        $this->thenHotelRoomShouldBeSaved(self::HOTEL_ROOM_ID, self::PRICE, $this->start, $this->end);
+        $this->subject->add(self::HOTEL_ROOM_ID, self::PRICE, $this->start, $this->end);
     }
 
     private function givenHotelRoomExists()
