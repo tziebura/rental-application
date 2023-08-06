@@ -2,6 +2,7 @@
 
 namespace App\Tests\Application\ApartmentOffer;
 
+use App\Application\ApartmentOffer\ApartmentOfferDto;
 use App\Application\ApartmentOffer\ApartmentOfferService;
 use App\Domain\Apartment\ApartmentNotFoundException;
 use App\Domain\Apartment\ApartmentRepository;
@@ -36,12 +37,10 @@ class ApartmentOfferServiceTest extends TestCase
     public function shouldCreateApartmentOfferWhenApartmentExists(): void
     {
         $this->givenApartmentExists();
-        $price = 100.0;
-        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
-        $end = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
+        $dto = $this->givenApartmentDto();
 
-        $this->thenApartmentOfferShouldBeAdded($price, $start, $end);
-        $this->subject->add(self::APARTMENT_ID, $price, $start, $end);
+        $this->thenApartmentOfferShouldBeAdded($dto->getPrice(), $dto->getStart(), $dto->getEnd());
+        $this->subject->add($dto);
     }
 
     /**
@@ -50,15 +49,12 @@ class ApartmentOfferServiceTest extends TestCase
     public function shouldRecognizeApartmentDoesNotExist(): void
     {
         $this->givenApartmentDoesNotExist();
-
-        $price = 100.0;
-        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
-        $end = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
+        $dto = $this->givenApartmentDto();
 
         $this->expectException(ApartmentNotFoundException::class);
         $this->expectExceptionMessage(sprintf('Apartment with ID %s does not exist', self::APARTMENT_ID));
 
-        $this->subject->add(self::APARTMENT_ID, $price, $start, $end);
+        $this->subject->add($dto);
     }
 
     private function givenApartmentDoesNotExist(): void
@@ -89,5 +85,19 @@ class ApartmentOfferServiceTest extends TestCase
 
                 return true;
             }));
+    }
+
+    private function givenApartmentDto(): ApartmentOfferDto
+    {
+        $price = 100.0;
+        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
+        $end   = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
+
+        return new ApartmentOfferDto(
+            self::APARTMENT_ID,
+            $price,
+            $start,
+            $end
+        );
     }
 }

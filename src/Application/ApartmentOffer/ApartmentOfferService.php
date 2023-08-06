@@ -19,16 +19,16 @@ class ApartmentOfferService
         $this->apartmentRepository = $apartmentRepository;
     }
 
-    public function add(string $apartmentId, float $price, DateTimeImmutable $start, DateTimeImmutable $end)
+    public function add(ApartmentOfferDto $dto)
     {
-        if (!$this->apartmentRepository->existsById($apartmentId)) {
-            throw ApartmentNotFoundException::withId($apartmentId);
+        if (!$this->apartmentRepository->existsById($dto->getApartmentId())) {
+            throw ApartmentNotFoundException::withId($dto->getApartmentId());
         }
 
         $offer = ApartmentOfferBuilder::create()
-            ->withApartmentId($apartmentId)
-            ->withPrice($price)
-            ->withAvailability($start, $end)
+            ->withApartmentId($dto->getApartmentId())
+            ->withPrice($dto->getPrice())
+            ->withAvailability($dto->getStart(), $dto->getEnd())
             ->build();
 
         $this->apartmentOfferRepository->save($offer);
