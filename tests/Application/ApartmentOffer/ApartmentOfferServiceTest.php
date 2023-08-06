@@ -2,7 +2,7 @@
 
 namespace App\Tests\Application\ApartmentOffer;
 
-use App\Application\ApartmentOffer\ApartmentOfferDto;
+use App\Application\ApartmentOffer\ApartmentOfferDTO;
 use App\Application\ApartmentOffer\ApartmentOfferService;
 use App\Domain\Apartment\ApartmentNotFoundException;
 use App\Domain\Apartment\ApartmentRepository;
@@ -73,7 +73,7 @@ class ApartmentOfferServiceTest extends TestCase
     {
         $this->givenApartmentExists();
 
-        $dto = new ApartmentOfferDto(
+        $dto = new ApartmentOfferDTO(
             self::APARTMENT_ID,
             -13.0,
             $this->start,
@@ -93,7 +93,7 @@ class ApartmentOfferServiceTest extends TestCase
     {
         $this->givenApartmentExists();
 
-        $dto = new ApartmentOfferDto(
+        $dto = new ApartmentOfferDTO(
             self::APARTMENT_ID,
             100.0,
             $this->end,
@@ -116,7 +116,7 @@ class ApartmentOfferServiceTest extends TestCase
     public function shouldCreateApartmentOfferWithZeroPrice(): void
     {
         $this->givenApartmentExists();
-        $dto = new ApartmentOfferDto(
+        $dto = new ApartmentOfferDTO(
             self::APARTMENT_ID,
             0.0,
             $this->start,
@@ -157,9 +157,9 @@ class ApartmentOfferServiceTest extends TestCase
             }));
     }
 
-    private function givenApartmentDto(): ApartmentOfferDto
+    private function givenApartmentDto(): ApartmentOfferDTO
     {
-        return new ApartmentOfferDto(
+        return new ApartmentOfferDTO(
             self::APARTMENT_ID,
             100.0,
             $this->start,

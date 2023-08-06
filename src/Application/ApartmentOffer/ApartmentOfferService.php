@@ -18,7 +18,7 @@ class ApartmentOfferService
         $this->apartmentRepository = $apartmentRepository;
     }
 
-    public function add(ApartmentOfferDto $dto)
+    public function add(ApartmentOfferDTO $dto)
     {
         if (!$this->apartmentRepository->existsById($dto->getApartmentId())) {
             throw ApartmentNotFoundException::withId($dto->getApartmentId());

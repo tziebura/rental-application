@@ -3,10 +3,21 @@
 namespace App\Domain\ApartmentOffer;
 
 use DateTimeImmutable;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Embeddable()
+ */
 class ApartmentAvailability
 {
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
     private DateTimeImmutable $start;
+
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
     private DateTimeImmutable $end;
 
     private function __construct(DateTimeImmutable $start, DateTimeImmutable $end)
