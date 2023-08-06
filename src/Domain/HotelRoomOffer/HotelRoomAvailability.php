@@ -21,11 +21,7 @@ class HotelRoomAvailability
         $end = $end->setTime(0, 0);
 
         if ($start > $end) {
-            throw new HotelRoomAvailabilityException(sprintf(
-                'Start date %s of availability is after end date %s.',
-                $start->format('Y-m-d'),
-                $end->format('Y-m-d'),
-            ));
+            throw HotelRoomAvailabilityException::startAfterEnd($start, $end);
         }
 
         return new self($start, $end);
