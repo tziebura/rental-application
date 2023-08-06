@@ -12,6 +12,7 @@ use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Domain\ApartmentOffer\NotAllowedMoneyValueException;
 use App\Tests\Domain\ApartmentOffer\ApartmentOfferAssertion;
 use DateTimeImmutable;
+use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
 
 class ApartmentOfferServiceTest extends TestCase
@@ -102,7 +103,11 @@ class ApartmentOfferServiceTest extends TestCase
         );
 
         $this->expectException(ApartmentAvailabilityException::class);
-        $this->expectExceptionMessage('Start date of availability is after end date.');
+        $this->expectExceptionMessage(sprintf(
+            'Start date %s of availability is after end date %s.',
+            $end->format(DateTimeInterface::ATOM),
+            $start->format(DateTimeInterface::ATOM),
+        ));
 
         $this->subject->add($dto);
     }

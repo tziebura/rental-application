@@ -18,7 +18,7 @@ class ApartmentAvailability
     public static function of(DateTimeImmutable $start, DateTimeImmutable $end): self
     {
         if ($start > $end) {
-            throw ApartmentAvailabilityException::startAfterEnd();
+            throw ApartmentAvailabilityException::startAfterEnd($start, $end);
         }
 
         return new self($start, $end);
