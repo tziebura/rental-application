@@ -111,6 +111,26 @@ class ApartmentOfferServiceTest extends TestCase
         $this->subject->add($dto);
     }
 
+    /**
+     * @test
+     */
+    public function shouldCreateApartmentOfferWithZeroPrice(): void
+    {
+        $this->givenApartmentExists();
+        $price = 0.0;
+        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
+        $end   = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
+        $dto = new ApartmentOfferDto(
+            self::APARTMENT_ID,
+            $price,
+            $start,
+            $end
+        );
+
+        $this->thenApartmentOfferShouldBeAdded($price, $start, $end);
+        $this->subject->add($dto);
+    }
+
     private function givenApartmentDoesNotExist(): void
     {
         $this->apartmentRepository->expects($this->once())
