@@ -43,7 +43,7 @@ class HotelRoomOfferBuilder
         $hotelRoomOffer = new HotelRoomOffer(
             $this->carry->hotelRoomId,
             Money::of($this->carry->price),
-            new HotelRoomAvailability($this->carry->start, $this->carry->end)
+            HotelRoomAvailability::of($this->carry->start, $this->carry->end)
         );
 
         $this->carry = new stdClass();
