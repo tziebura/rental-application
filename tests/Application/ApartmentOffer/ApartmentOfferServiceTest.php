@@ -8,6 +8,7 @@ use App\Domain\Apartment\ApartmentNotFoundException;
 use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\ApartmentOffer\ApartmentOffer;
 use App\Domain\ApartmentOffer\ApartmentOfferRepository;
+use App\Domain\ApartmentOffer\NotAllowedMoneyValueException;
 use App\Tests\Domain\ApartmentOffer\ApartmentOfferAssertion;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
@@ -53,6 +54,30 @@ class ApartmentOfferServiceTest extends TestCase
 
         $this->expectException(ApartmentNotFoundException::class);
         $this->expectExceptionMessage(sprintf('Apartment with ID %s does not exist', self::APARTMENT_ID));
+
+        $this->subject->add($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizePriceLowerThanZero(): void
+    {
+        $this->givenApartmentExists();
+
+        $price = -13.0;
+        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
+        $end   = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
+
+        $dto = new ApartmentOfferDto(
+            self::APARTMENT_ID,
+            $price,
+            $start,
+            $end
+        );
+
+        $this->expectException(NotAllowedMoneyValueException::class);
+        $this->expectExceptionMessage('Price -13 is lower than zero.');
 
         $this->subject->add($dto);
     }
