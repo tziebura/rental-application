@@ -42,7 +42,7 @@ class HotelRoomOfferBuilder
     {
         $hotelRoomOffer = new HotelRoomOffer(
             $this->carry->hotelRoomId,
-            new Money($this->carry->price),
+            Money::of($this->carry->price),
             new HotelRoomAvailability($this->carry->start, $this->carry->end)
         );
 
