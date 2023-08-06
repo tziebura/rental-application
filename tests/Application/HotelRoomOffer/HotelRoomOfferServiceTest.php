@@ -114,6 +114,31 @@ class HotelRoomOfferServiceTest extends TestCase
         $this->subject->add($dto);
     }
 
+    /**
+     * @test
+     */
+    public function shouldRecognizeStartDateEarlierThanToday(): void
+    {
+        $start = (new DateTimeImmutable())->modify('-1days');
+        $end = (new DateTimeImmutable())->modify('+14days');
+
+        $this->givenHotelRoomExists();
+        $dto = new HotelRoomOfferDTO(
+            self::HOTEL_ROOM_ID,
+            self::PRICE,
+            $start,
+            $end
+        );
+
+        $this->expectException(HotelRoomAvailabilityException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Start date must be at least today, %s given.',
+            $start->format('Y-m-d'),
+        ));
+
+        $this->subject->add($dto);
+    }
+
     private function givenHotelRoomExists()
     {
         $this->hotelRoomRepository->expects($this->once())
