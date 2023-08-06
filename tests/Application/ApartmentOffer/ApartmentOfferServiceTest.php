@@ -3,6 +3,8 @@
 namespace App\Tests\Application\ApartmentOffer;
 
 use App\Application\ApartmentOffer\ApartmentOfferService;
+use App\Domain\Apartment\ApartmentNotFoundException;
+use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\ApartmentOffer\ApartmentOffer;
 use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Tests\Domain\ApartmentOffer\ApartmentOfferAssertion;
@@ -13,21 +15,25 @@ class ApartmentOfferServiceTest extends TestCase
 {
     private const APARTMENT_ID = '1';
     private ApartmentOfferRepository $apartmentOfferRepository;
+    private ApartmentRepository $apartmentRepository;
 
     private ApartmentOfferService $subject;
 
     public function setUp(): void
     {
         $this->apartmentOfferRepository = $this->createMock(ApartmentOfferRepository::class);
+        $this->apartmentRepository = $this->createMock(ApartmentRepository::class);
+
         $this->subject = new ApartmentOfferService(
-            $this->apartmentOfferRepository
+            $this->apartmentOfferRepository,
+            $this->apartmentRepository
         );
     }
 
     /**
      * @test
      */
-    public function shouldCreateApartmentOffer(): void
+    public function shouldCreateApartmentOfferWhenApartmentExists(): void
     {
         $this->givenApartmentExists();
         $price = 100.0;
@@ -38,8 +44,37 @@ class ApartmentOfferServiceTest extends TestCase
         $this->subject->add(self::APARTMENT_ID, $price, $start, $end);
     }
 
+    /**
+     * @test
+     */
+    public function shouldRecognizeApartmentDoesNotExist(): void
+    {
+        $this->givenApartmentDoesNotExist();
+
+        $price = 100.0;
+        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
+        $end = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
+
+        $this->expectException(ApartmentNotFoundException::class);
+        $this->expectExceptionMessage(sprintf('Apartment with ID %s does not exist', self::APARTMENT_ID));
+
+        $this->subject->add(self::APARTMENT_ID, $price, $start, $end);
+    }
+
+    private function givenApartmentDoesNotExist(): void
+    {
+        $this->apartmentRepository->expects($this->once())
+            ->method('existsById')
+            ->with(self::APARTMENT_ID)
+            ->willReturn(false);
+    }
+
     private function givenApartmentExists(): void
     {
+        $this->apartmentRepository->expects($this->once())
+            ->method('existsById')
+            ->with(self::APARTMENT_ID)
+            ->willReturn(true);
     }
 
     private function thenApartmentOfferShouldBeAdded(int $price, DateTimeImmutable $start, DateTimeImmutable $end): void
