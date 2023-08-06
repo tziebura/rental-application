@@ -7,4 +7,6 @@ interface ApartmentRepository
     public function save(Apartment $apartment): void;
 
     public function findById(string $id): ?Apartment;
+
+    public function existsById(string $id): bool;
 }
