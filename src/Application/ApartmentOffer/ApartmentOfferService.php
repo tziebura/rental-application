@@ -22,7 +22,7 @@ class ApartmentOfferService
     public function add(string $apartmentId, float $price, DateTimeImmutable $start, DateTimeImmutable $end)
     {
         if (!$this->apartmentRepository->existsById($apartmentId)) {
-            throw new ApartmentNotFoundException(sprintf('Apartment with ID %s does not exist', $apartmentId));
+            throw ApartmentNotFoundException::withId($apartmentId);
         }
 
         $offer = ApartmentOfferBuilder::create()
