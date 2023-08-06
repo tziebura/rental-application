@@ -21,7 +21,7 @@ class HotelRoomOfferService
     public function add(HotelRoomOfferDTO $dto): void
     {
         if (!$this->hotelRoomRepository->existsById($dto->getHotelRoomId())) {
-            throw new HotelRoomNotFoundException(sprintf('Hotel room with ID %s does not exist', $dto->getHotelRoomId()));
+            throw HotelRoomNotFoundException::withId($dto->getHotelRoomId());
         }
 
         $hotelRoomOffer = HotelRoomOfferBuilder::create()
