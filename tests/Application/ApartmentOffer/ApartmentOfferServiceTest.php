@@ -89,7 +89,7 @@ class ApartmentOfferServiceTest extends TestCase
     /**
      * @test
      */
-    public function shouldRecognizeStartIsAfterThanEnd(): void
+    public function shouldRecognizeStartIsAfterEnd(): void
     {
         $this->givenApartmentExists();
 

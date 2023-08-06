@@ -6,6 +6,7 @@ use App\Application\HotelRoomOffer\HotelRoomOfferDTO;
 use App\Application\HotelRoomOffer\HotelRoomOfferService;
 use App\Domain\HotelRoom\HotelRoomNotFoundException;
 use App\Domain\HotelRoom\HotelRoomRepository;
+use App\Domain\HotelRoomOffer\HotelRoomAvailabilityException;
 use App\Domain\HotelRoomOffer\HotelRoomOffer;
 use App\Domain\HotelRoomOffer\HotelRoomOfferRepository;
 use App\Domain\HotelRoomOffer\NotAllowedMoneyValueException;
@@ -86,6 +87,29 @@ class HotelRoomOfferServiceTest extends TestCase
 
         $this->expectException(NotAllowedMoneyValueException::class);
         $this->expectExceptionMessage('Price 0 is lower than or equal to zero.');
+
+        $this->subject->add($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeStartIsAfterEnd(): void
+    {
+        $this->givenHotelRoomExists();
+        $dto = new HotelRoomOfferDTO(
+            self::HOTEL_ROOM_ID,
+            self::PRICE,
+            $this->end,
+            $this->start
+        );
+
+        $this->expectException(HotelRoomAvailabilityException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Start date %s of availability is after end date %s.',
+            $this->end->format('Y-m-d'),
+            $this->start->format('Y-m-d'),
+        ));
 
         $this->subject->add($dto);
     }
