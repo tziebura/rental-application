@@ -2,6 +2,7 @@
 
 namespace App\Tests\Application\HotelRoomOffer;
 
+use App\Application\HotelRoomOffer\HotelRoomOfferDTO;
 use App\Application\HotelRoomOffer\HotelRoomOfferService;
 use App\Domain\HotelRoomOffer\HotelRoomOffer;
 use App\Domain\HotelRoomOffer\HotelRoomOfferRepository;
@@ -37,9 +38,16 @@ class HotelRoomOfferServiceTest extends TestCase
     public function shouldCreateHotelRoomOffer(): void
     {
         $this->givenHotelRoomExists();
+        $dto = $this->givenHotelRoomDto();
 
-        $this->thenHotelRoomShouldBeSaved(self::HOTEL_ROOM_ID, self::PRICE, $this->start, $this->end);
-        $this->subject->add(self::HOTEL_ROOM_ID, self::PRICE, $this->start, $this->end);
+        $this->thenHotelRoomShouldBeSaved(
+            $dto->getHotelRoomId(),
+            $dto->getPrice(),
+            $dto->getStart(),
+            $dto->getEnd()
+        );
+
+        $this->subject->add($dto);
     }
 
     private function givenHotelRoomExists()
@@ -58,5 +66,15 @@ class HotelRoomOfferServiceTest extends TestCase
 
                 return true;
             }));
+    }
+
+    private function givenHotelRoomDto(): HotelRoomOfferDTO
+    {
+        return new HotelRoomOfferDTO(
+            self::HOTEL_ROOM_ID,
+            self::PRICE,
+            $this->start,
+            $this->end
+        );
     }
 }
