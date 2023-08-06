@@ -43,10 +43,7 @@ class ApartmentOfferBuilder
         $offer = new ApartmentOffer(
             $this->carry->apartmentId,
             Money::of($this->carry->price),
-            new ApartmentAvailability(
-                $this->carry->start,
-                $this->carry->end
-            )
+            ApartmentAvailability::of($this->carry->start, $this->carry->end)
         );
 
         $this->carry = new stdClass();
