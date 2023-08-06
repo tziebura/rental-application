@@ -6,6 +6,7 @@ use App\Application\ApartmentOffer\ApartmentOfferDto;
 use App\Application\ApartmentOffer\ApartmentOfferService;
 use App\Domain\Apartment\ApartmentNotFoundException;
 use App\Domain\Apartment\ApartmentRepository;
+use App\Domain\ApartmentOffer\ApartmentAvailabilityException;
 use App\Domain\ApartmentOffer\ApartmentOffer;
 use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Domain\ApartmentOffer\NotAllowedMoneyValueException;
@@ -78,6 +79,30 @@ class ApartmentOfferServiceTest extends TestCase
 
         $this->expectException(NotAllowedMoneyValueException::class);
         $this->expectExceptionMessage('Price -13 is lower than zero.');
+
+        $this->subject->add($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeStartIsAfterThanEnd(): void
+    {
+        $this->givenApartmentExists();
+
+        $price = 100.0;
+        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
+        $end   = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
+
+        $dto = new ApartmentOfferDto(
+            self::APARTMENT_ID,
+            $price,
+            $end,
+            $start
+        );
+
+        $this->expectException(ApartmentAvailabilityException::class);
+        $this->expectExceptionMessage('Start date of availability is after end date.');
 
         $this->subject->add($dto);
     }
