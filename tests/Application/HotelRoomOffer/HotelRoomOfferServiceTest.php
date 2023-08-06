@@ -8,6 +8,7 @@ use App\Domain\HotelRoom\HotelRoomNotFoundException;
 use App\Domain\HotelRoom\HotelRoomRepository;
 use App\Domain\HotelRoomOffer\HotelRoomOffer;
 use App\Domain\HotelRoomOffer\HotelRoomOfferRepository;
+use App\Domain\HotelRoomOffer\NotAllowedMoneyValueException;
 use App\Tests\Domain\HotelRoomOffer\HotelRoomOfferAssertion;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
@@ -66,6 +67,25 @@ class HotelRoomOfferServiceTest extends TestCase
 
         $this->expectException(HotelRoomNotFoundException::class);
         $this->expectExceptionMessage(sprintf('Hotel room with ID %s does not exist', self::HOTEL_ROOM_ID));
+
+        $this->subject->add($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizePriceLessThanOrEqualToZero(): void
+    {
+        $this->givenHotelRoomExists();
+        $dto = new HotelRoomOfferDTO(
+            self::HOTEL_ROOM_ID,
+            0,
+            $this->start,
+            $this->end
+        );
+
+        $this->expectException(NotAllowedMoneyValueException::class);
+        $this->expectExceptionMessage('Price 0 is lower than or equal to zero.');
 
         $this->subject->add($dto);
     }
