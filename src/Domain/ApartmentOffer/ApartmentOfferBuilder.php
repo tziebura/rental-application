@@ -42,7 +42,7 @@ class ApartmentOfferBuilder
     {
         $offer = new ApartmentOffer(
             $this->carry->apartmentId,
-            new Money($this->carry->price),
+            Money::of($this->carry->price),
             new ApartmentAvailability(
                 $this->carry->start,
                 $this->carry->end
