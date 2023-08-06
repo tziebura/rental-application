@@ -17,15 +17,22 @@ use PHPUnit\Framework\TestCase;
 class ApartmentOfferServiceTest extends TestCase
 {
     private const APARTMENT_ID = '1';
+    private DateTimeImmutable $start;
+    private DateTimeImmutable $end;
+
     private ApartmentOfferRepository $apartmentOfferRepository;
     private ApartmentRepository $apartmentRepository;
 
     private ApartmentOfferService $subject;
 
+
     public function setUp(): void
     {
         $this->apartmentOfferRepository = $this->createMock(ApartmentOfferRepository::class);
         $this->apartmentRepository = $this->createMock(ApartmentRepository::class);
+
+        $this->start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
+        $this->end = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
 
         $this->subject = new ApartmentOfferService(
             $this->apartmentOfferRepository,
@@ -66,15 +73,11 @@ class ApartmentOfferServiceTest extends TestCase
     {
         $this->givenApartmentExists();
 
-        $price = -13.0;
-        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
-        $end   = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
-
         $dto = new ApartmentOfferDto(
             self::APARTMENT_ID,
-            $price,
-            $start,
-            $end
+            -13.0,
+            $this->start,
+            $this->end
         );
 
         $this->expectException(NotAllowedMoneyValueException::class);
@@ -90,22 +93,18 @@ class ApartmentOfferServiceTest extends TestCase
     {
         $this->givenApartmentExists();
 
-        $price = 100.0;
-        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
-        $end   = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
-
         $dto = new ApartmentOfferDto(
             self::APARTMENT_ID,
-            $price,
-            $end,
-            $start
+            100.0,
+            $this->end,
+            $this->start
         );
 
         $this->expectException(ApartmentAvailabilityException::class);
         $this->expectExceptionMessage(sprintf(
             'Start date %s of availability is after end date %s.',
-            $end->format('Y-m-d'),
-            $start->format('Y-m-d'),
+            $this->end->format('Y-m-d'),
+            $this->start->format('Y-m-d'),
         ));
 
         $this->subject->add($dto);
@@ -117,17 +116,14 @@ class ApartmentOfferServiceTest extends TestCase
     public function shouldCreateApartmentOfferWithZeroPrice(): void
     {
         $this->givenApartmentExists();
-        $price = 0.0;
-        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
-        $end   = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
         $dto = new ApartmentOfferDto(
             self::APARTMENT_ID,
-            $price,
-            $start,
-            $end
+            0.0,
+            $this->start,
+            $this->end
         );
 
-        $this->thenApartmentOfferShouldBeAdded($price, $start, $end);
+        $this->thenApartmentOfferShouldBeAdded(0.0, $this->start, $this->end);
         $this->subject->add($dto);
     }
 
@@ -163,15 +159,11 @@ class ApartmentOfferServiceTest extends TestCase
 
     private function givenApartmentDto(): ApartmentOfferDto
     {
-        $price = 100.0;
-        $start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
-        $end   = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
-
         return new ApartmentOfferDto(
             self::APARTMENT_ID,
-            $price,
-            $start,
-            $end
+            100.0,
+            $this->start,
+            $this->end
         );
     }
 }
