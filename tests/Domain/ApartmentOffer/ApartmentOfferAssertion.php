@@ -31,7 +31,8 @@ class ApartmentOfferAssertion
 
     public function hasPriceEqualTo(float $expected): self
     {
-        TestCase::assertEquals($expected, $this->getByReflection($this->actual, 'price'));
+        $actualPrice = $this->getByReflection($this->actual, 'price');
+        TestCase::assertEquals($expected, $this->getByReflection($actualPrice, 'value'));
         return $this;
     }
 

@@ -19,7 +19,9 @@ class ApartmentOfferServiceTest extends TestCase
     public function setUp(): void
     {
         $this->apartmentOfferRepository = $this->createMock(ApartmentOfferRepository::class);
-        $this->subject = new ApartmentOfferService();
+        $this->subject = new ApartmentOfferService(
+            $this->apartmentOfferRepository
+        );
     }
 
     /**
