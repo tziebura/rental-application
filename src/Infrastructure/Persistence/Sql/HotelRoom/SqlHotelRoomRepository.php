@@ -23,4 +23,9 @@ class SqlHotelRoomRepository implements HotelRoomRepository
     {
         return $this->doctrineOrmHotelRoomRepository->find($id);
     }
+
+    public function existsById(string $id): bool
+    {
+        return $this->doctrineOrmHotelRoomRepository->count(['id' => $id]) > 0;
+    }
 }

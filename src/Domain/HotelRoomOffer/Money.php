@@ -2,8 +2,16 @@
 
 namespace App\Domain\HotelRoomOffer;
 
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Embeddable()
+ */
 class Money
 {
+    /**
+     * @ORM\Column(type="float")
+     */
     private float $value;
 
     private function __construct(float $value)
