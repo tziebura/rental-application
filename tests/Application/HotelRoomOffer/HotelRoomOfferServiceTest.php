@@ -33,7 +33,8 @@ class HotelRoomOfferServiceTest extends TestCase
         $this->end = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
 
         $this->subject = new HotelRoomOfferService(
-            $this->hotelRoomOfferRepository
+            $this->hotelRoomOfferRepository,
+            $this->hotelRoomRepository
         );
     }
 
