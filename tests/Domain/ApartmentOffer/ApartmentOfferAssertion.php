@@ -39,8 +39,8 @@ class ApartmentOfferAssertion
     public function hasAvailabilityEqualTo(DateTimeImmutable $expectedStart, DateTimeImmutable $expectedEnd): self
     {
         $actualAvailability = $this->getByReflection($this->actual, 'availability');
-        TestCase::assertEquals($expectedStart, $this->getByReflection($actualAvailability, 'start'));
-        TestCase::assertEquals($expectedEnd, $this->getByReflection($actualAvailability, 'end'));
+        TestCase::assertEquals($expectedStart->setTime(0, 0), $this->getByReflection($actualAvailability, 'start'));
+        TestCase::assertEquals($expectedEnd->setTime(0, 0), $this->getByReflection($actualAvailability, 'end'));
         return $this;
     }
 }

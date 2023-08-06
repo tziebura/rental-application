@@ -12,7 +12,6 @@ use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Domain\ApartmentOffer\NotAllowedMoneyValueException;
 use App\Tests\Domain\ApartmentOffer\ApartmentOfferAssertion;
 use DateTimeImmutable;
-use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
 
 class ApartmentOfferServiceTest extends TestCase
