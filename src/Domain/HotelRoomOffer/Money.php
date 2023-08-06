@@ -14,7 +14,7 @@ class Money
     public static function of(float $price): self
     {
         if ($price <= 0) {
-            throw new NotAllowedMoneyValueException(sprintf('Price %s is lower than or equal to zero.', $price));
+            throw NotAllowedMoneyValueException::of($price);
         }
 
         return new self($price);
