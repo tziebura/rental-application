@@ -23,4 +23,9 @@ class SqlApartmentRepository implements ApartmentRepository
     {
         return $this->doctrineOrmApartmentRepository->find($id);
     }
+
+    public function existsById(string $id): bool
+    {
+        return $this->doctrineOrmApartmentRepository->count(['id' => $id]) > 0;
+    }
 }
