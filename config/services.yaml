@@ -15,6 +15,7 @@ services:
     App\Domain\Hotel\HotelRepository: '@App\Infrastructure\Persistence\Sql\Hotel\SqlHotelRepository'
     App\Domain\HotelRoom\HotelRoomRepository: '@App\Infrastructure\Persistence\Sql\HotelRoom\SqlHotelRoomRepository'
     App\Domain\ApartmentOffer\ApartmentOfferRepository: '@App\Infrastructure\Persistence\Sql\ApartmentOffer\SqlApartmentOfferRepository'
+    App\Domain\HotelRoomOffer\HotelRoomOfferRepository: '@App\Infrastructure\Persistence\Sql\HotelRoomOffer\SqlHotelRoomOfferRepository'
 
     App\Framework\Symfony\Extension\RequestDTOResolver:
         arguments:
