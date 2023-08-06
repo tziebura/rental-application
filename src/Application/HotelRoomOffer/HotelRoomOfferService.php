@@ -2,7 +2,10 @@
 
 namespace App\Application\HotelRoomOffer;
 
+use App\Domain\HotelRoomOffer\HotelRoomAvailability;
+use App\Domain\HotelRoomOffer\HotelRoomOffer;
 use App\Domain\HotelRoomOffer\HotelRoomOfferRepository;
+use App\Domain\HotelRoomOffer\Money;
 use DateTimeImmutable;
 
 class HotelRoomOfferService
@@ -16,7 +19,13 @@ class HotelRoomOfferService
 
     public function add(string $hotelRoomId, float $price, DateTimeImmutable $start, DateTimeImmutable $end)
     {
+        $hotelRoomOffer = new HotelRoomOffer(
+            $hotelRoomId,
+            new Money($price),
+            new HotelRoomAvailability($start, $end)
+        );
 
+        $this->hotelRoomOfferRepository->save($hotelRoomOffer);
     }
 
 }
