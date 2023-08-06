@@ -3,7 +3,6 @@
 namespace App\Domain\ApartmentOffer;
 
 use DateTimeImmutable;
-use DateTimeInterface;
 use RuntimeException;
 
 class ApartmentAvailabilityException extends RuntimeException
@@ -12,8 +11,8 @@ class ApartmentAvailabilityException extends RuntimeException
     {
         return new self(sprintf(
             'Start date %s of availability is after end date %s.',
-            $start->format(DateTimeInterface::ATOM),
-            $end->format(DateTimeInterface::ATOM),
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d'),
         ));
     }
 }

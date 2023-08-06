@@ -105,8 +105,8 @@ class ApartmentOfferServiceTest extends TestCase
         $this->expectException(ApartmentAvailabilityException::class);
         $this->expectExceptionMessage(sprintf(
             'Start date %s of availability is after end date %s.',
-            $end->format(DateTimeInterface::ATOM),
-            $start->format(DateTimeInterface::ATOM),
+            $end->format('Y-m-d'),
+            $start->format('Y-m-d'),
         ));
 
         $this->subject->add($dto);

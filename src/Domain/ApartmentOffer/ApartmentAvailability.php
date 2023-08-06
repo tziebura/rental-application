@@ -17,6 +17,9 @@ class ApartmentAvailability
 
     public static function of(DateTimeImmutable $start, DateTimeImmutable $end): self
     {
+        $start = $start->setTime(0,0);
+        $end = $end->setTime(0, 0);
+
         if ($start > $end) {
             throw ApartmentAvailabilityException::startAfterEnd($start, $end);
         }
