@@ -15,4 +15,12 @@ class HotelRoomAvailabilityException extends RuntimeException
             $end->format('Y-m-d'),
         ));
     }
+
+    public static function startEarlierThanToday(DateTimeImmutable $start): self
+    {
+        return new self(sprintf(
+            'Start date must be at least today, %s given.',
+            $start->format('Y-m-d'),
+        ));
+    }
 }

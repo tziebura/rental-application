@@ -27,10 +27,7 @@ class HotelRoomAvailability
         $today = (new DateTimeImmutable())->setTime(0, 0);
 
         if ($start < $today) {
-            throw new HotelRoomAvailabilityException(sprintf(
-                'Start date must be at least today, %s given.',
-                $start->format('Y-m-d'),
-            ));
+            throw HotelRoomAvailabilityException::startEarlierThanToday($start);
         }
 
         return new self($start, $end);
