@@ -2,7 +2,7 @@
 
 namespace App\Tests\Domain\Apartment;
 
-use App\Domain\Apartment\Address;
+use App\Domain\Address\Address;
 use App\Domain\Apartment\Apartment;
 use App\Domain\Apartment\Room;
 use App\Tests\PrivatePropertyManipulator;

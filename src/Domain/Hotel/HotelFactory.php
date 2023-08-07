@@ -2,6 +2,8 @@
 
 namespace App\Domain\Hotel;
 
+use App\Domain\Address\Address;
+
 class HotelFactory
 {
     public function create(

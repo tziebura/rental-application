@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Apartment;
+namespace App\Domain\Address;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -17,12 +17,12 @@ class Address
     /**
      * @ORM\Column()
      */
-    private string $postalCode;
+    private string $buildingNumber;
 
     /**
      * @ORM\Column()
      */
-    private string $houseNumber;
+    private string $postalCode;
 
     /**
      * @ORM\Column()
@@ -34,12 +34,14 @@ class Address
      */
     private string $country;
 
-    public function __construct(string $street, string $postalCode, string $houseNumber, string $city, string $country)
+    public function __construct(string $street, string $buildingNumber, string $postalCode, string $city, string $country)
     {
         $this->street = $street;
+        $this->buildingNumber = $buildingNumber;
         $this->postalCode = $postalCode;
-        $this->houseNumber = $houseNumber;
         $this->city = $city;
         $this->country = $country;
     }
+
+
 }

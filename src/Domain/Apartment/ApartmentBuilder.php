@@ -2,6 +2,7 @@
 
 namespace App\Domain\Apartment;
 
+use App\Domain\Address\Address;
 use stdClass;
 
 class ApartmentBuilder

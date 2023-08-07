@@ -2,6 +2,7 @@
 
 namespace App\Domain\Hotel;
 
+use App\Domain\Address\Address;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -22,7 +23,7 @@ class Hotel
     private string $name;
 
     /**
-     * @ORM\Embedded(class="App\Domain\Hotel\Address")
+     * @ORM\Embedded(class="App\Domain\Address\Address")
      */
     private Address $address;
 

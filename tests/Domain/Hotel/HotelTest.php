@@ -2,7 +2,7 @@
 
 namespace App\Tests\Domain\Hotel;
 
-use App\Domain\Hotel\Address;
+use App\Domain\Address\Address;
 use App\Domain\Hotel\HotelFactory;
 use PHPUnit\Framework\TestCase;
 

@@ -3,7 +3,7 @@
 namespace App\Tests\Application\Hotel;
 
 use App\Application\Hotel\HotelApplicationService;
-use App\Domain\Hotel\Address;
+use App\Domain\Address\Address;
 use App\Domain\Hotel\Hotel;
 use App\Domain\Hotel\HotelRepository;
 use App\Tests\Domain\Hotel\HotelAssertion;
