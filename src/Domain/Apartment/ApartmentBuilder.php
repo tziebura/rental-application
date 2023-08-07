@@ -89,8 +89,8 @@ class ApartmentBuilder
     {
         return new Address(
             $this->apartment->street,
-            $this->apartment->postalCode,
             $this->apartment->houseNumber,
+            $this->apartment->postalCode,
             $this->apartment->city,
             $this->apartment->country
         );

@@ -2,7 +2,7 @@
 
 namespace App\Domain\Booking;
 
-use App\Domain\Apartment\Period;
+use App\Domain\Period\Period;
 use App\Domain\EventChannel\EventChannel;
 use Doctrine\ORM\Mapping as ORM;
 

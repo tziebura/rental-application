@@ -40,8 +40,8 @@ class ApartmentAssertion
     {
         $address = new Address(
             $expectedStreet,
-            $expectedPostalCode,
             $expectedHouseNumber,
+            $expectedPostalCode,
             $expectedCity,
             $expectedCountry
         );

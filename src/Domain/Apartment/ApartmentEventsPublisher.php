@@ -5,6 +5,7 @@ namespace App\Domain\Apartment;
 use App\Domain\Event\EventCreationTimeFactory;
 use App\Domain\Event\EventIdFactory;
 use App\Domain\EventChannel\EventChannel;
+use App\Domain\Period\Period;
 
 class ApartmentEventsPublisher
 {

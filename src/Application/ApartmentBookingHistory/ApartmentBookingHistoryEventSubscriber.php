@@ -6,7 +6,7 @@ use App\Domain\Apartment\ApartmentBooked;
 use App\Domain\ApartmentBookingHistory\ApartmentBooking;
 use App\Domain\ApartmentBookingHistory\ApartmentBookingHistory;
 use App\Domain\ApartmentBookingHistory\ApartmentBookingHistoryRepository;
-use App\Domain\ApartmentBookingHistory\BookingPeriod;
+use App\Domain\Period\Period;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ApartmentBookingHistoryEventSubscriber implements EventSubscriberInterface
@@ -34,7 +34,7 @@ class ApartmentBookingHistoryEventSubscriber implements EventSubscriberInterface
             $apartmentBookingHistory = new ApartmentBookingHistory($event->getId());
         }
 
-        $bookingPeriod = new BookingPeriod($event->getPeriodStart(), $event->getPeriodEnd());
+        $bookingPeriod = Period::of($event->getPeriodStart(), $event->getPeriodEnd());
         $apartmentBookingHistory->add(ApartmentBooking::start(
            $event->getEventCreationDateTime(),
            $event->getOwnerId(),

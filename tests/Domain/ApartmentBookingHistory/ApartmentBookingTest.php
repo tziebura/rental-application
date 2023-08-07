@@ -3,7 +3,7 @@
 namespace App\Tests\Domain\ApartmentBookingHistory;
 
 use App\Domain\ApartmentBookingHistory\ApartmentBooking;
-use App\Domain\ApartmentBookingHistory\BookingPeriod;
+use App\Domain\Period\Period;
 use PHPUnit\Framework\TestCase;
 
 class ApartmentBookingTest extends TestCase
@@ -23,7 +23,7 @@ class ApartmentBookingTest extends TestCase
             $bookingDateTime,
             $ownerId,
             $tenantId,
-            new BookingPeriod($start, $end)
+            Period::of($start, $end)
         );
 
         ApartmentBookingAssertion::assertThat($actual)

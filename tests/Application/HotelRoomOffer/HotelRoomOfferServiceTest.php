@@ -46,7 +46,12 @@ class HotelRoomOfferServiceTest extends TestCase
     public function shouldCreateHotelRoomOffer(): void
     {
         $this->givenHotelRoomExists();
-        $dto = $this->givenHotelRoomDto();
+        $dto = new HotelRoomOfferDTO(
+            self::HOTEL_ROOM_ID,
+            self::PRICE,
+            new DateTimeImmutable(),
+            new DateTimeImmutable(),
+        );
 
         $this->thenHotelRoomShouldBeSaved(
             $dto->getHotelRoomId(),

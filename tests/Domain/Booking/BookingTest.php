@@ -4,7 +4,7 @@ namespace App\Tests\Domain\Booking;
 
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingAccepted;
-use App\Domain\Apartment\Period;
+use App\Domain\Period\Period;
 use App\Domain\Booking\BookingEventsPublisher;
 use App\Domain\Booking\RentalType;
 use App\Domain\EventChannel\EventChannel;

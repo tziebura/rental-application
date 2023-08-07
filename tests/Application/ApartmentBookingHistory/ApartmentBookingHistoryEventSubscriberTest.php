@@ -4,11 +4,10 @@ namespace App\Tests\Application\ApartmentBookingHistory;
 
 use App\Application\ApartmentBookingHistory\ApartmentBookingHistoryEventSubscriber;
 use App\Domain\Apartment\ApartmentBooked;
-use App\Domain\Apartment\Period;
+use App\Domain\Period\Period;
 use App\Domain\ApartmentBookingHistory\ApartmentBooking;
 use App\Domain\ApartmentBookingHistory\ApartmentBookingHistory;
 use App\Domain\ApartmentBookingHistory\ApartmentBookingHistoryRepository;
-use App\Domain\ApartmentBookingHistory\BookingPeriod;
 use App\Domain\Event\EventCreationTimeFactory;
 use App\Domain\Event\EventIdFactory;
 use App\Domain\HotelBookingHistory\BookingStep;
@@ -102,7 +101,7 @@ class ApartmentBookingHistoryEventSubscriberTest extends TestCase
             new DateTimeImmutable(),
             self::OWNER_ID,
             'otherTenantId',
-            new BookingPeriod(new DateTimeImmutable(), (new DateTimeImmutable())->modify('+1days'))
+            Period::of(new DateTimeImmutable(), (new DateTimeImmutable())->modify('+1days'))
         ));
 
         $this->repository->expects($this->once())
@@ -132,7 +131,7 @@ class ApartmentBookingHistoryEventSubscriberTest extends TestCase
                 $expectedBookingDateTime,
                 self::OWNER_ID,
                 self::TENANT_ID,
-                new BookingPeriod($period->getStart(), $period->getEnd()),
+                Period::of($period->getStart(), $period->getEnd()),
                 BookingStep::START
             );
     }

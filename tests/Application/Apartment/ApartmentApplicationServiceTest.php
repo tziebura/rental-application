@@ -10,7 +10,7 @@ use App\Domain\Apartment\ApartmentEventsPublisher;
 use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingRepository;
-use App\Domain\Apartment\Period;
+use App\Domain\Period\Period;
 use App\Tests\Domain\Apartment\ApartmentAssertion;
 use App\Tests\Domain\Booking\BookingAssertion;
 use App\Tests\PrivatePropertyManipulator;

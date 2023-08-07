@@ -4,7 +4,7 @@ namespace App\Tests\Domain\Apartment;
 
 use App\Domain\Apartment\ApartmentBooked;
 use App\Domain\Apartment\ApartmentEventsPublisher;
-use App\Domain\Apartment\Period;
+use App\Domain\Period\Period;
 use App\Domain\Event\EventCreationTimeFactory;
 use App\Domain\Event\EventIdFactory;
 use App\Domain\EventChannel\EventChannel;

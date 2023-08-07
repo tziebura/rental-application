@@ -60,3 +60,9 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Domain/Space'
                 prefix: 'App\Domain\Space'
                 alias: Space
+            Period:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Domain/Period'
+                prefix: 'App\Domain\Period'
+                alias: Period

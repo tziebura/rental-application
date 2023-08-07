@@ -2,7 +2,7 @@
 
 namespace App\Tests\Domain\ApartmentBookingHistory;
 
-use App\Domain\ApartmentBookingHistory\BookingPeriod;
+use App\Domain\Period\Period;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
@@ -16,6 +16,6 @@ class BookingPeriodTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Start cannot be greater than end.');
 
-        new BookingPeriod($start, $end);
+        Period::of($start, $end);
     }
 }

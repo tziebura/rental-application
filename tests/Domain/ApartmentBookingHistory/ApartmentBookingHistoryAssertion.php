@@ -4,7 +4,7 @@ namespace App\Tests\Domain\ApartmentBookingHistory;
 
 use App\Domain\ApartmentBookingHistory\ApartmentBooking;
 use App\Domain\ApartmentBookingHistory\ApartmentBookingHistory;
-use App\Domain\ApartmentBookingHistory\BookingPeriod;
+use App\Domain\Period\Period;
 use App\Tests\PrivatePropertyManipulator;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\Collection;
@@ -40,7 +40,7 @@ class ApartmentBookingHistoryAssertion
 
     public function hasEntryWith(
         DateTimeImmutable $expectedBookingDateTime, string $expectedOwnerId, string $expectedTenantId,
-        BookingPeriod $expectedBookingPeriod, string $expectedStep)
+        Period $expectedBookingPeriod, string $expectedStep)
     {
         /** @var Collection<int, ApartmentBooking $actualBookings */
         $actualBookings = $this->getByReflection($this->actual, 'bookings');

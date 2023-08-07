@@ -2,6 +2,7 @@
 
 namespace App\Domain\ApartmentBookingHistory;
 
+use App\Domain\Period\Period;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -39,9 +40,9 @@ class ApartmentBooking
     private string $tenantId;
 
     /**
-     * @ORM\Embedded(class="BookingPeriod")
+     * @ORM\Embedded(class="App\Domain\Period\Period")
      */
-    private BookingPeriod $bookingPeriod;
+    private Period $bookingPeriod;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Domain\ApartmentBookingHistory\ApartmentBookingHistory", inversedBy="bookings")
@@ -49,7 +50,7 @@ class ApartmentBooking
      */
     private ApartmentBookingHistory $apartmentBookingHistory;
 
-    public function __construct(string $step, DateTimeImmutable $bookingDateTime, string $ownerId, string $tenantId, BookingPeriod $bookingPeriod)
+    public function __construct(string $step, DateTimeImmutable $bookingDateTime, string $ownerId, string $tenantId, Period $bookingPeriod)
     {
         $this->id = null;
         $this->step = $step;
@@ -59,7 +60,7 @@ class ApartmentBooking
         $this->bookingPeriod = $bookingPeriod;
     }
 
-    public static function start(DateTimeImmutable $bookingDateTime, string $ownerId, string $tenantId, BookingPeriod $bookingPeriod): self
+    public static function start(DateTimeImmutable $bookingDateTime, string $ownerId, string $tenantId, Period $bookingPeriod): self
     {
         return new self(
             BookingStep::START,

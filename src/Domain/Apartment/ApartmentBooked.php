@@ -2,6 +2,7 @@
 
 namespace App\Domain\Apartment;
 
+use App\Domain\Period\Period;
 use DateTimeImmutable;
 use Ramsey\Uuid\Uuid;
 

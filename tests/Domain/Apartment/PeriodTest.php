@@ -2,7 +2,7 @@
 
 namespace App\Tests\Domain\Apartment;
 
-use App\Domain\Apartment\Period;
+use App\Domain\Period\Period;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
