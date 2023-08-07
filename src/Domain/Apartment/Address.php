@@ -27,11 +27,6 @@ class Address
     /**
      * @ORM\Column()
      */
-    private string $apartmentNumber;
-
-    /**
-     * @ORM\Column()
-     */
     private string $city;
 
     /**
@@ -39,12 +34,11 @@ class Address
      */
     private string $country;
 
-    public function __construct(string $street, string $postalCode, string $houseNumber, string $apartmentNumber, string $city, string $country)
+    public function __construct(string $street, string $postalCode, string $houseNumber, string $city, string $country)
     {
         $this->street = $street;
         $this->postalCode = $postalCode;
         $this->houseNumber = $houseNumber;
-        $this->apartmentNumber = $apartmentNumber;
         $this->city = $city;
         $this->country = $country;
     }

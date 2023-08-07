@@ -76,6 +76,7 @@ class ApartmentBuilder
     {
         return new Apartment(
             $this->apartment->ownerId,
+            $this->apartment->apartmentNumber,
             $this->address(),
             $this->apartment->description,
             $this->rooms()
@@ -88,7 +89,6 @@ class ApartmentBuilder
             $this->apartment->street,
             $this->apartment->postalCode,
             $this->apartment->houseNumber,
-            $this->apartment->apartmentNumber,
             $this->apartment->city,
             $this->apartment->country
         );

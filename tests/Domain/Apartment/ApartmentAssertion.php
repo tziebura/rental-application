@@ -42,7 +42,6 @@ class ApartmentAssertion
             $expectedStreet,
             $expectedPostalCode,
             $expectedHouseNumber,
-            $expectedApartmentNumber,
             $expectedCity,
             $expectedCountry
         );

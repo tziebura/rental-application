@@ -37,13 +37,19 @@ class Apartment
     private string $description;
 
     /**
+     * @ORM\Column(name="address_apartment_number")
+     */
+    private string $apartmentNumber;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Domain\Apartment\Room", mappedBy="apartment", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     private Collection $rooms;
 
-    public function __construct(string $ownerId, Address $address, string $description, array $rooms)
+    public function __construct(string $ownerId, string $apartmentNumber, Address $address, string $description, array $rooms)
     {
         $this->ownerId = $ownerId;
+        $this->apartmentNumber = $apartmentNumber;
         $this->address = $address;
         $this->description = $description;
         $this->rooms = new ArrayCollection(array_map(function (Room $room) {
