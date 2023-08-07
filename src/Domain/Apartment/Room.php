@@ -2,42 +2,20 @@
 
 namespace App\Domain\Apartment;
 
+use App\Domain\Space\Space;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="apartment_rooms")
  */
-class Room
+class Room extends Space
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Column(type="integer")
-     */
-    private int $id;
-
-    /**
-     * @ORM\Column()
-     */
-    private string $name;
-
-    /**
-     * @ORM\Embedded(class="App\Domain\Apartment\SquareMeter")
-     */
-    private SquareMeter $squareMeter;
-
     /**
      * @ORM\ManyToOne(targetEntity="Apartment", inversedBy="rooms")
      * @ORM\JoinColumn(name="apartment_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private Apartment $apartment;
-
-    public function __construct(string $name, SquareMeter $squareMeter)
-    {
-        $this->name = $name;
-        $this->squareMeter = $squareMeter;
-    }
 
     public function assignToApartment(Apartment $apartment)
     {

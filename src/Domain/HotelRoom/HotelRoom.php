@@ -4,6 +4,7 @@ namespace App\Domain\HotelRoom;
 
 use App\Domain\Booking\Booking;
 use App\Domain\EventChannel\EventChannel;
+use App\Domain\Space\Space;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -46,7 +47,7 @@ class HotelRoom
         $this->hotelId = $hotelId;
         $this->number = $number;
         $this->description = $description;
-        $this->rooms = new ArrayCollection(array_map(function (Room $room) {
+        $this->rooms = new ArrayCollection(array_map(function (Space $room) {
             $room->assignToHotelRoom($this);
             return $room;
         }, $rooms));

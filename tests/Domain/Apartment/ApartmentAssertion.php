@@ -61,7 +61,7 @@ class ApartmentAssertion
         foreach ($actualRooms as $index => $room) {
             TestCase::assertEquals($roomNames[$index], $this->getByReflection($room, 'name'));
             TestCase::assertEquals($roomSizes[$index], $this->getByReflection(
-                $this->getByReflection($room, 'squareMeter'),
+                $this->getByReflection($room, 'size'),
                 'size'
             ));
         }

@@ -20,7 +20,7 @@ class Room
         return new self(
             (int) $data['id'],
             $data['name'],
-            (float) $data['square_meter_size']
+            (float) $data['size_size']
         );
     }
 

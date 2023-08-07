@@ -3,6 +3,7 @@
 namespace App\Domain\Apartment;
 
 use App\Domain\Address\Address;
+use App\Domain\Space\SquareMeter;
 use stdClass;
 
 class ApartmentBuilder
