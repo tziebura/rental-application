@@ -36,7 +36,7 @@ class Apartment
             $data['owner_id'],
             $data['address_street'],
             $data['address_postal_code'],
-            $data['address_house_number'],
+            $data['address_building_number'],
             $data['address_apartment_number'],
             $data['address_city'],
             $data['address_country'],
