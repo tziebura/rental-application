@@ -8,7 +8,6 @@ use App\Domain\Hotel\Hotel;
 use App\Domain\Hotel\HotelFactory;
 use App\Domain\Hotel\HotelRepository;
 use App\Domain\Hotel\HotelRoomNotFoundException;
-use App\Domain\Hotel\HotelRoomRepository;
 use App\Domain\HotelRoomOffer\HotelRoomAvailabilityException;
 use App\Domain\HotelRoomOffer\HotelRoomOffer;
 use App\Domain\HotelRoomOffer\HotelRoomOfferRepository;

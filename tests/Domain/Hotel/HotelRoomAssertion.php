@@ -23,12 +23,6 @@ class HotelRoomAssertion
         return new self($actual);
     }
 
-    public function hasHotelIdEqualTo(string $expected): self
-    {
-        TestCase::assertEquals($expected, $this->getByReflection($this->actual, 'hotelId'));
-        return $this;
-    }
-
     public function hasNumberEqualTo(int $expected): self
     {
         TestCase::assertEquals($expected, $this->getByReflection($this->actual, 'number'));
