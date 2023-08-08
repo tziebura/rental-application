@@ -2,10 +2,8 @@
 
 namespace App\Application\HotelBookingHistory;
 
+use App\Domain\Hotel\HotelRoomBooked;
 use App\Domain\HotelBookingHistory\HotelBookingHistory;
-use App\Domain\HotelRoom\HotelRoomBooked;
-use App\Domain\HotelBookingHistory\HotelRoomBooking;
-use App\Domain\HotelBookingHistory\HotelRoomBookingHistory;
 use App\Domain\HotelBookingHistory\HotelBookingHistoryRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

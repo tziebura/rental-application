@@ -45,4 +45,10 @@ class HotelRoomOfferAssertion
         TestCase::assertEquals($expectedEnd, $this->getByReflection($actualAvailability, 'end'));
         return $this;
     }
+
+    public function hasHotelRoomNumber(string $expected): self
+    {
+        TestCase::assertEquals($expected, $this->getByReflection($this->actual, 'hotelRoomNumber'));
+        return $this;
+    }
 }

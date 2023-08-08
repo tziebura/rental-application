@@ -6,22 +6,29 @@ use DateTimeImmutable;
 
 class HotelRoomOfferDTO
 {
-    private string $hotelRoomId;
+    private string $hotelId;
+    private int $hotelRoomNumber;
     private float $price;
     private DateTimeImmutable $start;
     private DateTimeImmutable $end;
 
-    public function __construct(string $hotelRoomId, float $price, DateTimeImmutable $start, DateTimeImmutable $end)
+    public function __construct(string $hotelId, int $hotelRoomNumber, float $price, DateTimeImmutable $start, DateTimeImmutable $end)
     {
-        $this->hotelRoomId = $hotelRoomId;
+        $this->hotelId = $hotelId;
+        $this->hotelRoomNumber = $hotelRoomNumber;
         $this->price = $price;
         $this->start = $start;
         $this->end = $end;
     }
 
-    public function getHotelRoomId(): string
+    public function getHotelId(): string
     {
-        return $this->hotelRoomId;
+        return $this->hotelId;
+    }
+
+    public function getHotelRoomNumber(): int
+    {
+        return $this->hotelRoomNumber;
     }
 
     public function getPrice(): float

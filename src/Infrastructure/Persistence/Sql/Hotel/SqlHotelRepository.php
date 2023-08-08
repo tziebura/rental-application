@@ -18,4 +18,9 @@ class SqlHotelRepository implements HotelRepository
     {
         $this->doctrineOrmHotelRepository->save($hotel);
     }
+
+    public function findById(string $hotelId): ?Hotel
+    {
+        return $this->doctrineOrmHotelRepository->find($hotelId);
+    }
 }

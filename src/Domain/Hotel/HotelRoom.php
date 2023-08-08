@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Domain\HotelRoom;
+namespace App\Domain\Hotel;
 
 use App\Domain\Booking\Booking;
-use App\Domain\EventChannel\EventChannel;
 use App\Domain\Space\Space;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -14,7 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class HotelRoom
 {
-
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -23,9 +21,10 @@ class HotelRoom
     private int $id;
 
     /**
-     * @ORM\Column()
+     * @ORM\ManyToOne(targetEntity="App\Domain\Hotel\Hotel", inversedBy="rooms")
+     * @ORM\JoinColumn(onDelete="CASCADE")
      */
-    private string $hotelId;
+    private Hotel $hotel;
 
     /**
      * @ORM\Column()
@@ -38,13 +37,13 @@ class HotelRoom
     private string $description;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Domain\HotelRoom\Room", mappedBy="hotelRoom", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Domain\Hotel\Room", mappedBy="hotelRoom", cascade={"persist", "remove"}, orphanRemoval=true)
      */
     private Collection $rooms;
 
-    public function __construct(string $hotelId, int $number, string $description, array $rooms)
+    public function __construct(Hotel $hotel, int $number, string $description, array $rooms)
     {
-        $this->hotelId = $hotelId;
+        $this->hotel = $hotel;
         $this->number = $number;
         $this->description = $description;
         $this->rooms = new ArrayCollection(array_map(function (Space $room) {
@@ -53,11 +52,11 @@ class HotelRoom
         }, $rooms));
     }
 
-    public function book(array $days, string $tenantId, HotelRoomEventsPublisher $hotelRoomEventsPublisher): Booking
+    public function book(array $days, string $tenantId, HotelEventsPublisher $hotelRoomEventsPublisher): Booking
     {
         $hotelRoomEventsPublisher->publishHotelRoomBooked(
             $this->id,
-            $this->hotelId,
+            $this->hotel->getId(),
             $days,
             $tenantId
         );
@@ -67,5 +66,10 @@ class HotelRoom
             $tenantId,
             $days
         );
+    }
+
+    public function getNumber(): int
+    {
+        return $this->number;
     }
 }

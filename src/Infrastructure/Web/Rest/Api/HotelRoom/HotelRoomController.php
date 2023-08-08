@@ -2,7 +2,9 @@
 
 namespace App\Infrastructure\Web\Rest\Api\HotelRoom;
 
-use App\Application\HotelRoom\HotelRoomApplicationService;
+use App\Application\Hotel\HotelApplicationService;
+use App\Application\Hotel\HotelRoomBookingDTO;
+use App\Application\Hotel\HotelRoomDTO;
 use App\Query\HotelRoom\HotelRoomReadModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,13 +17,13 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class HotelRoomController extends AbstractController
 {
-    private HotelRoomApplicationService $hotelRoomApplicationService;
+    private HotelApplicationService $hotelApplicationService;
     private HotelRoomReadModel $hotelRoomReadModel;
     private SerializerInterface $serializer;
 
-    public function __construct(HotelRoomApplicationService $hotelRoomApplicationService, HotelRoomReadModel $hotelRoomReadModel, SerializerInterface $serializer)
+    public function __construct(HotelApplicationService $hotelApplicationService, HotelRoomReadModel $hotelRoomReadModel, SerializerInterface $serializer)
     {
-        $this->hotelRoomApplicationService = $hotelRoomApplicationService;
+        $this->hotelApplicationService = $hotelApplicationService;
         $this->hotelRoomReadModel = $hotelRoomReadModel;
         $this->serializer = $serializer;
     }
@@ -43,12 +45,7 @@ class HotelRoomController extends AbstractController
      */
     public function post(HotelRoomDTO $dto): Response
     {
-        $this->hotelRoomApplicationService->add(
-            $dto->getHotelId(),
-            $dto->getNumber(),
-            $dto->getDescription(),
-            $dto->getRooms()
-        );
+        $this->hotelApplicationService->addHotelRoom($dto);
 
         return new JsonResponse([], Response::HTTP_CREATED);
     }
@@ -58,11 +55,7 @@ class HotelRoomController extends AbstractController
      */
     public function book(string $id, HotelRoomBookingDto $bookingDto): Response
     {
-        $this->hotelRoomApplicationService->book(
-            $id,
-            $bookingDto->getDays(),
-            $bookingDto->getTenantId()
-        );
+        $this->hotelApplicationService->book($bookingDto);
 
         return new JsonResponse([], Response::HTTP_OK);
     }

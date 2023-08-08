@@ -13,7 +13,6 @@ services:
     App\Domain\HotelBookingHistory\HotelBookingHistoryRepository: '@App\Infrastructure\Persistence\Sql\HotelBookingHistory\SqlHotelBookingHistoryRepository'
     App\Domain\Apartment\ApartmentRepository: '@App\Infrastructure\Persistence\Sql\Apartment\SqlApartmentRepository'
     App\Domain\Hotel\HotelRepository: '@App\Infrastructure\Persistence\Sql\Hotel\SqlHotelRepository'
-    App\Domain\HotelRoom\HotelRoomRepository: '@App\Infrastructure\Persistence\Sql\HotelRoom\SqlHotelRoomRepository'
     App\Domain\ApartmentOffer\ApartmentOfferRepository: '@App\Infrastructure\Persistence\Sql\ApartmentOffer\SqlApartmentOfferRepository'
     App\Domain\HotelRoomOffer\HotelRoomOfferRepository: '@App\Infrastructure\Persistence\Sql\HotelRoomOffer\SqlHotelRoomOfferRepository'
 
@@ -35,7 +34,7 @@ services:
             - '@app.event.event_creation_time_factory'
             - '@App\Domain\EventChannel\EventChannel'
 
-    App\Domain\HotelRoom\HotelRoomEventsPublisher:
+    App\Domain\Hotel\HotelEventsPublisher:
         arguments:
             - '@app.event.event_id_factory'
             - '@app.event.event_creation_time_factory'

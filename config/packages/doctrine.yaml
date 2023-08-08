@@ -24,12 +24,6 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Domain/Hotel'
                 prefix: 'App\Domain\Hotel'
                 alias: Hotel
-            HotelRoom:
-                is_bundle: false
-                type: annotation
-                dir: '%kernel.project_dir%/src/Domain/HotelRoom'
-                prefix: 'App\Domain\HotelRoom'
-                alias: HotelRoom
             Booking:
                 is_bundle: false
                 type: annotation

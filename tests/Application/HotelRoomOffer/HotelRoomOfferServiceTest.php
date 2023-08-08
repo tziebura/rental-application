@@ -4,39 +4,61 @@ namespace App\Tests\Application\HotelRoomOffer;
 
 use App\Application\HotelRoomOffer\HotelRoomOfferDTO;
 use App\Application\HotelRoomOffer\HotelRoomOfferService;
-use App\Domain\HotelRoom\HotelRoomNotFoundException;
-use App\Domain\HotelRoom\HotelRoomRepository;
+use App\Domain\Hotel\Hotel;
+use App\Domain\Hotel\HotelFactory;
+use App\Domain\Hotel\HotelRepository;
+use App\Domain\Hotel\HotelRoomNotFoundException;
+use App\Domain\Hotel\HotelRoomRepository;
 use App\Domain\HotelRoomOffer\HotelRoomAvailabilityException;
 use App\Domain\HotelRoomOffer\HotelRoomOffer;
 use App\Domain\HotelRoomOffer\HotelRoomOfferRepository;
 use App\Domain\HotelRoomOffer\NotAllowedMoneyValueException;
 use App\Tests\Domain\HotelRoomOffer\HotelRoomOfferAssertion;
+use App\Tests\PrivatePropertyManipulator;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class HotelRoomOfferServiceTest extends TestCase
 {
-    private const HOTEL_ROOM_ID = '1';
+    use PrivatePropertyManipulator;
+
+    private const TENANT_ID = '1';
+    private const HOTEL_ID = '1';
+    private const ROOM_NUMBER = 1;
+    private const DESCRIPTION = 'description';
+    private const ROOMS = [
+        'living_room' => 20.0,
+        'kitchen' => 10.0,
+        'bedroom' => 25.5,
+        'bathroom' => 15.2
+    ];
+    private const HOTEL_ROOM_ID = '2';
+    private const NAME = 'name';
+    private const STREET = 'street';
+    private const BUILDING_NUMBER = '1';
+    private const POSTAL_CODE = '12-123';
+    private const CITY = 'city';
+    private const COUNTRY = 'country';
     private const PRICE = 10.0;
     private DateTimeImmutable $start;
     private DateTimeImmutable $end;
 
     private HotelRoomOfferRepository $hotelRoomOfferRepository;
-    private HotelRoomRepository $hotelRoomRepository;
+    private HotelRepository $hotelRepository;
 
     private HotelRoomOfferService $subject;
 
     public function setUp(): void
     {
         $this->hotelRoomOfferRepository = $this->createMock(HotelRoomOfferRepository::class);
-        $this->hotelRoomRepository = $this->createMock(HotelRoomRepository::class);
+        $this->hotelRepository = $this->createMock(HotelRepository::class);
 
         $this->start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
         $this->end = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
 
         $this->subject = new HotelRoomOfferService(
             $this->hotelRoomOfferRepository,
-            $this->hotelRoomRepository
+            $this->hotelRepository
         );
     }
 
@@ -45,16 +67,17 @@ class HotelRoomOfferServiceTest extends TestCase
      */
     public function shouldCreateHotelRoomOffer(): void
     {
-        $this->givenHotelRoomExists();
+        $this->givenHotelWithRoomExists();
         $dto = new HotelRoomOfferDTO(
-            self::HOTEL_ROOM_ID,
+            self::HOTEL_ID,
+            self::ROOM_NUMBER,
             self::PRICE,
             new DateTimeImmutable(),
             new DateTimeImmutable(),
         );
 
         $this->thenHotelRoomShouldBeSaved(
-            $dto->getHotelRoomId(),
+            $dto->getHotelRoomNumber(),
             $dto->getPrice(),
             $dto->getStart(),
             $dto->getEnd()
@@ -68,11 +91,11 @@ class HotelRoomOfferServiceTest extends TestCase
      */
     public function shouldRecognizeHotelRoomDoesNotExist(): void
     {
-        $this->givenHotelRoomDoesNotExist();
+        $this->givenHotelWithoutRoom();
         $dto = $this->givenHotelRoomDto();
 
         $this->expectException(HotelRoomNotFoundException::class);
-        $this->expectExceptionMessage(sprintf('Hotel room with ID %s does not exist', self::HOTEL_ROOM_ID));
+        $this->expectExceptionMessage('Hotel room with number 1 does not exist');
 
         $this->subject->add($dto);
     }
@@ -82,9 +105,10 @@ class HotelRoomOfferServiceTest extends TestCase
      */
     public function shouldRecognizePriceLessThanOrEqualToZero(): void
     {
-        $this->givenHotelRoomExists();
+        $this->givenHotelWithRoomExists();
         $dto = new HotelRoomOfferDTO(
-            self::HOTEL_ROOM_ID,
+            self::HOTEL_ID,
+            self::ROOM_NUMBER,
             0,
             $this->start,
             $this->end
@@ -101,9 +125,10 @@ class HotelRoomOfferServiceTest extends TestCase
      */
     public function shouldRecognizeStartIsAfterEnd(): void
     {
-        $this->givenHotelRoomExists();
+        $this->givenHotelWithRoomExists();
         $dto = new HotelRoomOfferDTO(
-            self::HOTEL_ROOM_ID,
+            self::HOTEL_ID,
+            self::ROOM_NUMBER,
             self::PRICE,
             $this->end,
             $this->start
@@ -127,9 +152,10 @@ class HotelRoomOfferServiceTest extends TestCase
         $start = (new DateTimeImmutable())->modify('-1days');
         $end = (new DateTimeImmutable())->modify('+14days');
 
-        $this->givenHotelRoomExists();
+        $this->givenHotelWithRoomExists();
         $dto = new HotelRoomOfferDTO(
-            self::HOTEL_ROOM_ID,
+            self::HOTEL_ID,
+            self::ROOM_NUMBER,
             self::PRICE,
             $start,
             $end
@@ -144,43 +170,80 @@ class HotelRoomOfferServiceTest extends TestCase
         $this->subject->add($dto);
     }
 
-    private function givenHotelRoomExists()
+    private function givenHotelWithRoomExists()
     {
-        $this->hotelRoomRepository->expects($this->once())
-            ->method('existsById')
-            ->with(self::HOTEL_ROOM_ID)
-            ->willReturn(true);
+        $hotel = $this->givenHotelWithRoom();
+
+        $this->hotelRepository->expects($this->once())
+            ->method('findById')
+            ->with(self::HOTEL_ID)
+            ->willReturn($hotel);
     }
 
     private function givenHotelRoomDto(): HotelRoomOfferDTO
     {
         return new HotelRoomOfferDTO(
-            self::HOTEL_ROOM_ID,
+            self::HOTEL_ID,
+            self::ROOM_NUMBER,
             self::PRICE,
             $this->start,
             $this->end
         );
     }
 
-    private function givenHotelRoomDoesNotExist()
+    private function givenHotelWithoutRoom(): void
     {
-        $this->hotelRoomRepository->expects($this->once())
-            ->method('existsById')
-            ->with(self::HOTEL_ROOM_ID)
-            ->willReturn(false);
+        $hotel = (new HotelFactory())->create(
+            self::NAME,
+            self::STREET,
+            self::BUILDING_NUMBER,
+            self::POSTAL_CODE,
+            self::CITY,
+            self::COUNTRY
+        );
+
+        $this->setByReflection($hotel, 'id', (int) self::HOTEL_ID);
+        $this->hotelRepository->expects($this->once())
+            ->method('findById')
+            ->with(self::HOTEL_ID)
+            ->willReturn($hotel);
     }
 
-    private function thenHotelRoomShouldBeSaved(string $hotelRoomId, float $price, DateTimeImmutable $start, DateTimeImmutable $end)
+    private function thenHotelRoomShouldBeSaved(string $hotelRoomNumber, float $price, DateTimeImmutable $start, DateTimeImmutable $end)
     {
         $this->hotelRoomOfferRepository->expects($this->once())
             ->method('save')
-            ->with($this->callback(function (HotelRoomOffer $actual) use ($hotelRoomId, $price, $start, $end) {
+            ->with($this->callback(function (HotelRoomOffer $actual) use ($hotelRoomNumber, $price, $start, $end) {
                 HotelRoomOfferAssertion::assertThat($actual)
-                    ->hasHotelRoomId($hotelRoomId)
+                    ->hasHotelRoomNumber($hotelRoomNumber)
                     ->hasPrice($price)
                     ->hasAvailability($start, $end);
 
                 return true;
             }));
+    }
+
+    private function givenHotelWithRoom(): Hotel
+    {
+        $hotel = (new HotelFactory())->create(
+            self::NAME,
+            self::STREET,
+            self::BUILDING_NUMBER,
+            self::POSTAL_CODE,
+            self::CITY,
+            self::COUNTRY
+        );
+
+        $this->setByReflection($hotel, 'id', (int) self::HOTEL_ID);
+
+        $hotel->addHotelRoom(
+            self::ROOM_NUMBER,
+            self::DESCRIPTION,
+            self::ROOMS
+        );
+
+        $hotelRoom = $this->getByReflection($hotel, 'rooms')->first();
+        $this->setByReflection($hotelRoom, 'id', (int) self::HOTEL_ROOM_ID);
+        return $hotel;
     }
 }

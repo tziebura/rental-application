@@ -19,9 +19,9 @@ class HotelRoomOfferBuilder
         return new self();
     }
 
-    public function withHotelRoomId(string $hotelRoomId): self
+    public function withHotelRoomNumber(string $hotelRoomNumber): self
     {
-        $this->carry->hotelRoomId = $hotelRoomId;
+        $this->carry->hotelRoomNumber = $hotelRoomNumber;
         return $this;
     }
 
@@ -38,10 +38,17 @@ class HotelRoomOfferBuilder
         return $this;
     }
 
+    public function withHotelId(string $hotelId): self
+    {
+        $this->carry->hotelId = $hotelId;
+        return $this;
+    }
+
     public function build(): HotelRoomOffer
     {
         $hotelRoomOffer = new HotelRoomOffer(
-            $this->carry->hotelRoomId,
+            $this->carry->hotelId,
+            $this->carry->hotelRoomNumber,
             Money::of($this->carry->price),
             HotelRoomAvailability::of($this->carry->start, $this->carry->end)
         );

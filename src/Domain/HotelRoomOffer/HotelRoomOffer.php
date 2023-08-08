@@ -20,7 +20,12 @@ class HotelRoomOffer
     /**
      * @ORM\Column()
      */
-    private string $hotelRoomId;
+    private string $hotelId;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $hotelRoomNumber;
 
     /**
      * @ORM\Embedded(class="App\Domain\HotelRoomOffer\Money")
@@ -32,9 +37,10 @@ class HotelRoomOffer
      */
     private HotelRoomAvailability $availability;
 
-    public function __construct(string $hotelRoomId, Money $price, HotelRoomAvailability $availability)
+    public function __construct(string $hotelId, int $hotelRoomNumber, Money $price, HotelRoomAvailability $availability)
     {
-        $this->hotelRoomId = $hotelRoomId;
+        $this->hotelId = $hotelId;
+        $this->hotelRoomNumber = $hotelRoomNumber;
         $this->price = $price;
         $this->availability = $availability;
     }

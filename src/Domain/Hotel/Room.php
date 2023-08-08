@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\HotelRoom;
+namespace App\Domain\Hotel;
 
 use App\Domain\Space\Space;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Room extends Space
 {
     /**
-     * @ORM\ManyToOne(targetEntity="App\Domain\HotelRoom\HotelRoom", inversedBy="rooms")
+     * @ORM\ManyToOne(targetEntity="App\Domain\Hotel\HotelRoom", inversedBy="rooms")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     private HotelRoom $hotelRoom;

@@ -1,29 +1,12 @@
 <?php
 
-namespace App\Infrastructure\Web\Rest\Api\HotelRoom;
-
-use Symfony\Component\Validator\Constraints as Assert;
+namespace App\Application\Hotel;
 
 class HotelRoomDTO
 {
-    /**
-     * @Assert\NotBlank()
-     */
     private string $hotelId;
-
-    /**
-     * @Assert\NotBlank()
-     */
     private int $number;
-
-    /**
-     * @Assert\NotBlank()
-     */
     private string $description;
-
-    /**
-     * @var array<string, float>
-     */
     private array $rooms;
 
     public function __construct(string $hotelId, int $number, string $description, array $rooms)
