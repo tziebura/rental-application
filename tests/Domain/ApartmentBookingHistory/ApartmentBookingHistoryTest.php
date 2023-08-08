@@ -27,12 +27,12 @@ class ApartmentBookingHistoryTest extends TestCase
             new DateTimeImmutable('03-02-2022'),
         );
 
-        $actual->add(ApartmentBooking::start(
+        $actual->addBookingStart(
             $bookingDateTime,
             $ownerId,
             $tenantId,
             $bookingPeriod
-        ));
+        );
 
         ApartmentBookingHistoryAssertion::assertThat($actual)
             ->hasApartmentIdEqualTo($apartmentId)

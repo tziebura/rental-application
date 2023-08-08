@@ -15,12 +15,12 @@ class ApartmentBookingHistoryFixture extends AbstractFixture implements ORMFixtu
     public function load(ObjectManager $manager)
     {
         $bookingHistory = new ApartmentBookingHistory(1);
-        $bookingHistory->add(ApartmentBooking::start(
+        $bookingHistory->addBookingStart(
             new DateTimeImmutable('01-01-2022'),
             1,
             'tenantId',
             Period::of(new DateTimeImmutable('01-02-2022'), new DateTimeImmutable('02-02-2022'))
-        ));
+        );
 
         $manager->persist($bookingHistory);
         $manager->flush();

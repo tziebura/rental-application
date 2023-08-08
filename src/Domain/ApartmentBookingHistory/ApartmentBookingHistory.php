@@ -2,6 +2,8 @@
 
 namespace App\Domain\ApartmentBookingHistory;
 
+use App\Domain\Period\Period;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -30,7 +32,17 @@ class ApartmentBookingHistory
         $this->bookings = new ArrayCollection();
     }
 
-    public function add(ApartmentBooking $booking): void
+    public function addBookingStart(DateTimeImmutable $bookingDateTime, string $ownerId, string $tenantId, Period $bookingPeriod): void
+    {
+        $this->add(ApartmentBooking::start(
+            $bookingDateTime,
+            $ownerId,
+            $tenantId,
+            $bookingPeriod
+        ));
+    }
+
+    private function add(ApartmentBooking $booking): void
     {
         $this->bookings->add($booking);
         $booking->setApartmentBookingHistory($this);

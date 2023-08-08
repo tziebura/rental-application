@@ -97,12 +97,12 @@ class ApartmentBookingHistoryEventSubscriberTest extends TestCase
     private function givenExistingApartmentBookingHistory()
     {
         $history = new ApartmentBookingHistory(self::APARTMENT_ID);
-        $history->add(ApartmentBooking::start(
+        $history->addBookingStart(
             new DateTimeImmutable(),
             self::OWNER_ID,
             'otherTenantId',
             Period::of(new DateTimeImmutable(), (new DateTimeImmutable())->modify('+1days'))
-        ));
+        );
 
         $this->repository->expects($this->once())
             ->method('findFor')
