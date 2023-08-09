@@ -1,0 +1,11 @@
+{
+  "hotel_id": "1",
+  "number": 1,
+  "description": "Nice room",
+  "rooms": {
+    "living_room": 20.0,
+    "kitchen": 10.0,
+    "bedroom": 25.5,
+    "bathroom": 15.2
+  }
+}

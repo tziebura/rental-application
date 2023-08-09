@@ -5,13 +5,24 @@ namespace App\Domain\HotelBookingHistory;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @todo add ORM annotations
+ * @ORM\Entity()
+ * @ORM\Table(name="hotel_booking_histories")
  */
 class HotelBookingHistory
 {
+    /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue(strategy="NONE")
+     * @ORM\Column(type="integer")
+     */
     private string $hotelId;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Domain\HotelBookingHistory\HotelRoomBookingHistory", mappedBy="hotelBookingHistory", cascade={"persist", "remove"}, orphanRemoval=true)
+     */
     private Collection $hotelRoomBookingHistories;
 
     public function __construct(string $hotelId)

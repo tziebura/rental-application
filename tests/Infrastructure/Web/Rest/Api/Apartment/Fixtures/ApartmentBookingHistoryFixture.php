@@ -2,7 +2,6 @@
 
 namespace App\Tests\Infrastructure\Web\Rest\Api\Apartment\Fixtures;
 
-use App\Domain\ApartmentBookingHistory\ApartmentBooking;
 use App\Domain\ApartmentBookingHistory\ApartmentBookingHistory;
 use App\Domain\Period\Period;
 use DateTimeImmutable;

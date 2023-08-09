@@ -17,7 +17,13 @@ doctrine:
                 type: annotation
                 dir: '%kernel.project_dir%/src/Domain/ApartmentBookingHistory'
                 prefix: 'App\Domain\ApartmentBookingHistory'
-                alias: Apartment
+                alias: ApartmentBookingHistory
+            HotelBookingHistory:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Domain/HotelBookingHistory'
+                prefix: 'App\Domain\HotelBookingHistory'
+                alias: HotelBookingHistory
             Hotel:
                 is_bundle: false
                 type: annotation

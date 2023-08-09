@@ -4,3 +4,9 @@ services:
 
   App\Tests\Infrastructure\Web\Rest\Api\Apartment\Fixtures\ApartmentBookingHistoryFixture:
     tags: [ 'doctrine.fixture.orm' ]
+
+  App\Tests\Infrastructure\Fixtures\Hotel\HotelWithoutRoomsFixture:
+    tags: [ 'doctrine.fixture.orm' ]
+
+  App\Tests\Infrastructure\Fixtures\Hotel\HotelWithRoomsFixture:
+    tags: [ 'doctrine.fixture.orm' ]

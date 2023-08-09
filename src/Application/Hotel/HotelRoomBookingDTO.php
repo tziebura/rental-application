@@ -2,11 +2,14 @@
 
 namespace App\Application\Hotel;
 
+use DateTimeImmutable;
+
 class HotelRoomBookingDTO
 {
     private string $hotelId;
     private int $roomNumber;
     private string $tenantId;
+    /** @var DateTimeImmutable[] */
     private array $days;
 
     public function __construct(string $hotelId, int $roomNumber, string $tenantId, array $days)

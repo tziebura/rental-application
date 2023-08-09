@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "name",
+    "street": "street",
+    "building_number": "1",
+    "postal_code": "12-123",
+    "city": "city",
+    "country": "country",
+    "number_of_rooms": 0
+  }
+]
