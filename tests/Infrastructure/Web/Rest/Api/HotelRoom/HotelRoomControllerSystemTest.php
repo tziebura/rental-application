@@ -58,4 +58,21 @@ class HotelRoomControllerSystemTest extends WebTestCase
             ->isHotelRoomBooking()
             ->isOpen();
     }
+
+    /**
+     * @test
+     */
+    public function shouldReturnHotelRoomsForExistingHotel(): void
+    {
+        $this->databaseTool->loadFixtures([HotelWithRoomsFixture::class]);
+        $this->browser->jsonRequest('GET', '/rest/v1/hotel-room/hotel/1');
+
+        $this->assertStatusCode(Response::HTTP_OK, $this->browser);
+
+        $actualResponse = $this->browser->getResponse()->getContent();
+        $this->assertJsonStringEqualsJsonFile(
+            __DIR__ . '/HotelRoomControllerSystemTest/index_response.json',
+            $actualResponse
+        );
+    }
 }

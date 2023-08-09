@@ -19,11 +19,11 @@ class SqlHotelRoomReadModel implements HotelRoomReadModel
         $hotelRooms = [];
 
         $stmt = $this->connection->prepare('SELECT * FROM hotel_room WHERE hotel_id = :hotel_id');
-        $result = $stmt->execute(['hotel_id' => $hotelId]);
+        $result = $stmt->executeQuery(['hotel_id' => $hotelId]);
 
         while($hotelRoom = $result->fetchAssociative()) {
             $stmt = $this->connection->prepare('SELECT * FROM room WHERE hotel_room_id = :id');
-            $result = $stmt->execute(['id' => $hotelRoom['id']]);
+            $result = $stmt->executeQuery(['id' => $hotelRoom['id']]);
 
             $hotelRoom['rooms'] = $result->fetchAllAssociative();
             $hotelRooms[] = HotelRoom::fromArray($hotelRoom);

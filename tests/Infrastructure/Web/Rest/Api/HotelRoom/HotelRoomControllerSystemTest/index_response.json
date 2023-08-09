@@ -1,0 +1,30 @@
+[
+  {
+    "description": "description",
+    "hotel_id": "1",
+    "id": 1,
+    "number": 1,
+    "rooms": [
+      {
+        "id": 1,
+        "name": "living_room",
+        "size": 20
+      },
+      {
+        "id": 2,
+        "name": "kitchen",
+        "size": 10
+      },
+      {
+        "id": 3,
+        "name": "bedroom",
+        "size": 25.5
+      },
+      {
+        "id": 4,
+        "name": "bathroom",
+        "size": 15.2
+      }
+    ]
+  }
+]
