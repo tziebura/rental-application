@@ -10,6 +10,7 @@ use App\Domain\Hotel\HotelRepository;
 use App\Domain\Hotel\HotelRoomNotFoundException;
 use App\Domain\HotelRoomOffer\HotelRoomAvailabilityException;
 use App\Domain\HotelRoomOffer\HotelRoomOffer;
+use App\Domain\HotelRoomOffer\HotelRoomOfferDomainService;
 use App\Domain\HotelRoomOffer\HotelRoomOfferRepository;
 use App\Domain\HotelRoomOffer\NotAllowedMoneyValueException;
 use App\Tests\Domain\HotelRoomOffer\HotelRoomOfferAssertion;
@@ -57,7 +58,8 @@ class HotelRoomOfferServiceTest extends TestCase
 
         $this->subject = new HotelRoomOfferService(
             $this->hotelRoomOfferRepository,
-            $this->hotelRepository
+            $this->hotelRepository,
+            new HotelRoomOfferDomainService()
         );
     }
 
