@@ -101,6 +101,10 @@ class ApartmentBuilder
      */
     private function rooms(): array
     {
+        if (!isset($this->apartment->roomsDefinition)) {
+            return [];
+        }
+
         return array_map(function (float $size, string $name) {
             return new Room($name, new SquareMeter($size));
         }, $this->apartment->roomsDefinition, array_keys($this->apartment->roomsDefinition));

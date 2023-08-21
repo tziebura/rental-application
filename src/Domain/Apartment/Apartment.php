@@ -5,6 +5,7 @@ namespace App\Domain\Apartment;
 use App\Domain\Address\Address;
 use App\Domain\Booking\Booking;
 use App\Domain\Period\Period;
+use App\Domain\Space\NotEnoughSpacesException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -53,6 +54,11 @@ class Apartment
         $this->apartmentNumber = $apartmentNumber;
         $this->address = $address;
         $this->description = $description;
+
+        if (empty($rooms)) {
+            throw NotEnoughSpacesException::noSpaces();
+        }
+
         $this->rooms = new ArrayCollection(array_map(function (Room $room) {
             $room->assignToApartment($this);
             return $room;

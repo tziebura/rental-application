@@ -6,6 +6,7 @@ use App\Domain\Apartment\Apartment;
 use App\Domain\Apartment\ApartmentBuilder;
 use App\Domain\Apartment\ApartmentEventsPublisher;
 use App\Domain\Period\Period;
+use App\Domain\Space\NotEnoughSpacesException;
 use App\Tests\Domain\Booking\BookingAssertion;
 use App\Tests\PrivatePropertyManipulator;
 use DateTimeImmutable;
@@ -101,6 +102,26 @@ class ApartmentTest extends TestCase
             $period,
             $this->apartmentEventsPublisher
         );
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowExceptionWhenCreatingApartmentWithNoSpaces()
+    {
+        $this->expectException(NotEnoughSpacesException::class);
+        $this->expectExceptionMessage('No spaces provided.');
+
+        ApartmentBuilder::create()
+            ->withStreet(self::STREET)
+            ->withPostalCode(self::POSTAL_CODE)
+            ->withHouseNumber(self::HOUSE_NUMBER)
+            ->withApartmentNumber(self::APARTMENT_NUMBER)
+            ->withCity(self::CITY)
+            ->withCountry(self::COUNTRY)
+            ->withOwnerId(self::OWNER_ID)
+            ->withDescription(self::DESCRIPTION)
+            ->build();
     }
 
     private function createApartment(): Apartment

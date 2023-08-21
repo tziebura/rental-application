@@ -4,6 +4,7 @@ namespace App\Tests\Domain\Booking;
 
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingAccepted;
+use App\Domain\Booking\NotAllowedBookingStatusTransitionException;
 use App\Domain\Period\Period;
 use App\Domain\Booking\BookingEventsPublisher;
 use App\Domain\Booking\RentalType;
@@ -104,6 +105,38 @@ class BookingTest extends TestCase
             );
 
         $actual->accept($this->bookingEventsPublisher);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotAllowToRejectAlreadyAcceptedBooking(): void
+    {
+        $actual = $this->givenHotelRoomBooking();
+        $actual->accept($this->bookingEventsPublisher);
+
+        $this->expectException(NotAllowedBookingStatusTransitionException::class);
+        $this->expectExceptionMessage('Not allowed to transition from ACCEPTED to REJECTED booking.');
+
+        $actual->reject();
+        BookingAssertion::assertThat($actual)
+            ->isAccepted();
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotAllowToAcceptAlreadyRejectedBooking(): void
+    {
+        $actual = $this->givenHotelRoomBooking();
+        $actual->reject();
+
+        $this->expectException(NotAllowedBookingStatusTransitionException::class);
+        $this->expectExceptionMessage('Not allowed to transition from REJECTED to ACCEPTED booking.');
+
+        $actual->accept($this->bookingEventsPublisher);
+        BookingAssertion::assertThat($actual)
+            ->isRejected();
     }
 
     public function givenHotelRoomBooking(): Booking

@@ -75,11 +75,19 @@ class Booking
 
     public function reject()
     {
+        if ($this->status === BookingStatus::ACCEPTED) {
+            throw NotAllowedBookingStatusTransitionException::with($this->status, BookingStatus::REJECTED);
+        }
+
         $this->status = BookingStatus::REJECTED;
     }
 
     public function accept(BookingEventsPublisher $bookingEventsPublisher)
     {
+        if ($this->status === BookingStatus::REJECTED) {
+            throw NotAllowedBookingStatusTransitionException::with($this->status, BookingStatus::ACCEPTED);
+        }
+
         $this->status = BookingStatus::ACCEPTED;
 
         $bookingEventsPublisher->publishBookingAccepted(
