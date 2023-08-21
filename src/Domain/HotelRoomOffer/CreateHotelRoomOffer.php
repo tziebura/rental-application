@@ -1,57 +1,57 @@
 <?php
 
-namespace App\Application\HotelRoomOffer;
+namespace App\Domain\HotelRoomOffer;
 
-use App\Domain\HotelRoomOffer\CreateHotelRoomOffer;
 use DateTimeImmutable;
 
-class HotelRoomOfferDTO
+class CreateHotelRoomOffer
 {
-    private string $hotelId;
     private int $hotelRoomNumber;
     private float $price;
     private DateTimeImmutable $start;
     private DateTimeImmutable $end;
 
-    public function __construct(string $hotelId, int $hotelRoomNumber, float $price, DateTimeImmutable $start, DateTimeImmutable $end)
+    /**
+     * @param int $hotelRoomNumber
+     * @param float $price
+     * @param DateTimeImmutable $start
+     * @param DateTimeImmutable $end
+     */
+    public function __construct(int $hotelRoomNumber, float $price, DateTimeImmutable $start, DateTimeImmutable $end)
     {
-        $this->hotelId = $hotelId;
         $this->hotelRoomNumber = $hotelRoomNumber;
         $this->price = $price;
         $this->start = $start;
         $this->end = $end;
     }
 
-    public function asDto(): CreateHotelRoomOffer
-    {
-        return new CreateHotelRoomOffer(
-            $this->hotelRoomNumber,
-            $this->price,
-            $this->start,
-            $this->end
-        );
-    }
-
-    public function getHotelId(): string
-    {
-        return $this->hotelId;
-    }
-
+    /**
+     * @return int
+     */
     public function getHotelRoomNumber(): int
     {
         return $this->hotelRoomNumber;
     }
 
+    /**
+     * @return float
+     */
     public function getPrice(): float
     {
         return $this->price;
     }
 
+    /**
+     * @return DateTimeImmutable
+     */
     public function getStart(): DateTimeImmutable
     {
         return $this->start;
     }
 
+    /**
+     * @return DateTimeImmutable
+     */
     public function getEnd(): DateTimeImmutable
     {
         return $this->end;
