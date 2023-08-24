@@ -143,6 +143,25 @@ class BookingDomainServiceTest extends TestCase
             ->isAccepted();
     }
 
+    /**
+     * @test
+     */
+    public function shouldRejectBookingWhenAtLeastOneWithCollisionFound(): void
+    {
+        $booking = $this->givenBooking();
+        $bookings = [
+            $this->givenOpenBookingWithCollision(),
+            $this->givenAcceptedBookingWithoutCollision(),
+            $this->givenRejectedBookingWithDaysCollision(),
+            $this->givenAcceptedBookingWithCollision(),
+        ];
+
+        $this->subject->accept($booking, $bookings);
+
+        BookingAssertion::assertThat($booking)
+            ->isRejected();
+    }
+
     public function givenBooking(): Booking
     {
         return new Booking(
