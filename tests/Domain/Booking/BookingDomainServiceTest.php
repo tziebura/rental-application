@@ -125,6 +125,24 @@ class BookingDomainServiceTest extends TestCase
             ->isAccepted();
     }
 
+    /**
+     * @test
+     */
+    public function shouldAcceptBookingWhenOthersWithoutCollisionFound(): void
+    {
+        $booking = $this->givenBooking();
+        $bookings = [
+            $this->givenOpenBookingWithCollision(),
+            $this->givenAcceptedBookingWithoutCollision(),
+            $this->givenRejectedBookingWithDaysCollision(),
+        ];
+
+        $this->subject->accept($booking, $bookings);
+
+        BookingAssertion::assertThat($booking)
+            ->isAccepted();
+    }
+
     public function givenBooking(): Booking
     {
         return new Booking(
@@ -183,5 +201,18 @@ class BookingDomainServiceTest extends TestCase
             self::RENTAL_TYPE,
             $this->bookingDatesWithCollision
         );
+    }
+
+    private function givenRejectedBookingWithDaysCollision(): Booking
+    {
+        $booking = new Booking(
+            self::RENTAL_PLACE_ID,
+            self::TENANT_ID_2,
+            self::RENTAL_TYPE,
+            $this->bookingDatesWithCollision
+        );
+
+        $booking->reject($this->createMock(BookingEventsPublisher::class));
+        return $booking;
     }
 }
