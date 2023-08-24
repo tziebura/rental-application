@@ -8,7 +8,6 @@ use App\Application\Booking\RejectBooking;
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingEventsPublisher;
 use App\Domain\Booking\BookingRepository;
-use App\Domain\EventChannel\EventChannel;
 use App\Tests\Domain\Booking\BookingAssertion;
 use PHPUnit\Framework\TestCase;
 
