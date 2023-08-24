@@ -104,4 +104,15 @@ class Booking
             $this->dates
         );
     }
+
+    public function hasCollisionWith(Booking $other): bool
+    {
+        foreach ($this->dates as $date) {
+            if (in_array($date, $other->dates, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

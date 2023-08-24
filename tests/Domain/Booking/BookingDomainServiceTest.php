@@ -18,6 +18,7 @@ class BookingDomainServiceTest extends TestCase
     private BookingEventsPublisher $bookingEventsPublisher;
     private array $bookingDates;
     private array $bookingDatesWithCollision;
+    private array $bookingDatesWithoutCollision;
 
     private BookingDomainService $subject;
 
@@ -37,6 +38,12 @@ class BookingDomainServiceTest extends TestCase
             new DateTimeImmutable('2023-08-24'),
             new DateTimeImmutable('2023-08-25'),
             new DateTimeImmutable('2023-08-26'),
+        ];
+
+        $this->bookingDatesWithoutCollision = [
+            new DateTimeImmutable('2023-08-26'),
+            new DateTimeImmutable('2023-08-27'),
+            new DateTimeImmutable('2023-08-28'),
         ];
     }
 
@@ -90,6 +97,20 @@ class BookingDomainServiceTest extends TestCase
         $this->subject->accept($booking, $bookings);
     }
 
+    /**
+     * @test
+     */
+    public function shouldAcceptBookingWhenOtherWithoutCollisionFound(): void
+    {
+        $booking = $this->givenBooking();
+        $bookings = [$this->givenBookingWithoutCollision()];
+
+        $this->subject->accept($booking, $bookings);
+
+        BookingAssertion::assertThat($booking)
+            ->isRejected();
+    }
+
     public function givenBooking(): Booking
     {
         return new Booking(
@@ -122,5 +143,15 @@ class BookingDomainServiceTest extends TestCase
         $this->bookingEventsPublisher->expects($this->once())
             ->method('publishBookingRejected')
             ->with(self::RENTAL_TYPE, self::RENTAL_PLACE_ID, self::TENANT_ID_1, $this->bookingDates);
+    }
+
+    private function givenBookingWithoutCollision(): Booking
+    {
+        return new Booking(
+            self::RENTAL_PLACE_ID,
+            self::TENANT_ID_2,
+            self::RENTAL_TYPE,
+            $this->bookingDatesWithoutCollision
+        );
     }
 }

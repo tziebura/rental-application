@@ -13,10 +13,25 @@ class BookingDomainService
 
     public function accept(Booking $booking, array $bookings)
     {
-        if (empty($bookings)) {
+        if ($this->canAcceptBooking($booking, $bookings)) {
             $booking->accept($this->bookingEventsPublisher);
         } else {
             $booking->reject($this->bookingEventsPublisher);
         }
+    }
+
+    private function canAcceptBooking(Booking $bookingToAccept, array $bookings): bool
+    {
+        if (empty($bookings)) {
+            return true;
+        }
+
+        foreach ($bookings as $booking) {
+            if ($booking->hasCollisionWith($bookingToAccept)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
