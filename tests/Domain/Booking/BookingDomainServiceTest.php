@@ -15,13 +15,29 @@ class BookingDomainServiceTest extends TestCase
     private const TENANT_ID_1     = 'tenantId';
     private const TENANT_ID_2     = 'tenantId2';
 
+    private BookingEventsPublisher $bookingEventsPublisher;
+    private array $bookingDates;
+    private array $bookingDatesWithCollision;
+
     private BookingDomainService $subject;
 
     public function setUp(): void
     {
+        $this->bookingEventsPublisher = $this->createMock(BookingEventsPublisher::class);
         $this->subject = new BookingDomainService(
-            $this->createMock(BookingEventsPublisher::class)
+            $this->bookingEventsPublisher
         );
+
+        $this->bookingDates = [
+            new DateTimeImmutable('2023-08-24'),
+            new DateTimeImmutable('2023-08-25'),
+        ];
+
+        $this->bookingDatesWithCollision = [
+            new DateTimeImmutable('2023-08-24'),
+            new DateTimeImmutable('2023-08-25'),
+            new DateTimeImmutable('2023-08-26'),
+        ];
     }
 
     /**
@@ -40,6 +56,17 @@ class BookingDomainServiceTest extends TestCase
     /**
      * @test
      */
+    public function shouldPublisherEventWhenBookingIsAccepted(): void
+    {
+        $booking = $this->givenBooking();
+
+        $this->thenBookingAcceptedEventShouldBePublished();
+        $this->subject->accept($booking, []);
+    }
+
+    /**
+     * @test
+     */
     public function shouldRejectBookingWhenOtherWithCollisionFound(): void
     {
         $booking = $this->givenBooking();
@@ -53,28 +80,28 @@ class BookingDomainServiceTest extends TestCase
 
     public function givenBooking(): Booking
     {
-        $dayOne = new DateTimeImmutable('2023-08-24');
-        $dayTwo = new DateTimeImmutable('2023-08-25');
-
         return new Booking(
             self::RENTAL_PLACE_ID,
             self::TENANT_ID_1,
             self::RENTAL_TYPE,
-            [$dayOne, $dayTwo]
+            $this->bookingDates
         );
     }
 
     private function givenBookingWithCollision(): Booking
     {
-        $dayOne   = new DateTimeImmutable('2023-08-24');
-        $dayTwo   = new DateTimeImmutable('2023-08-25');
-        $dayThree = new DateTimeImmutable('2023-08-26');
-
         return new Booking(
             self::RENTAL_PLACE_ID,
             self::TENANT_ID_2,
             self::RENTAL_TYPE,
-            [$dayOne, $dayTwo, $dayThree]
+            $this->bookingDatesWithCollision
         );
+    }
+
+    private function thenBookingAcceptedEventShouldBePublished(): void
+    {
+        $this->bookingEventsPublisher->expects($this->once())
+            ->method('publishBookingAccepted')
+            ->with(self::RENTAL_TYPE, self::RENTAL_PLACE_ID, self::TENANT_ID_1, $this->bookingDates);
     }
 }
