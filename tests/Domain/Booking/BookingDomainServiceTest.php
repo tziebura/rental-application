@@ -77,7 +77,7 @@ class BookingDomainServiceTest extends TestCase
     public function shouldRejectBookingWhenOtherWithCollisionFound(): void
     {
         $booking = $this->givenBooking();
-        $bookings = [$this->givenBookingWithCollision()];
+        $bookings = [$this->givenAcceptedBookingWithCollision()];
 
         $this->subject->accept($booking, $bookings);
 
@@ -91,7 +91,7 @@ class BookingDomainServiceTest extends TestCase
     public function shouldPublisherEventWhenBookingIsRejected(): void
     {
         $booking = $this->givenBooking();
-        $bookings = [$this->givenBookingWithCollision()];
+        $bookings = [$this->givenAcceptedBookingWithCollision()];
 
         $this->thenBookingRejectedEventShouldBePublished();
         $this->subject->accept($booking, $bookings);
@@ -103,12 +103,26 @@ class BookingDomainServiceTest extends TestCase
     public function shouldAcceptBookingWhenOtherWithoutCollisionFound(): void
     {
         $booking = $this->givenBooking();
-        $bookings = [$this->givenBookingWithoutCollision()];
+        $bookings = [$this->givenAcceptedBookingWithoutCollision()];
 
         $this->subject->accept($booking, $bookings);
 
         BookingAssertion::assertThat($booking)
-            ->isRejected();
+            ->isAccepted();
+    }
+
+    /**
+     * @test
+     */
+    public function shouldAcceptBookingWhenOtherWithCollisionButNotAcceptedFound(): void
+    {
+        $booking = $this->givenBooking();
+        $bookings = [$this->givenOpenBookingWithCollision()];
+
+        $this->subject->accept($booking, $bookings);
+
+        BookingAssertion::assertThat($booking)
+            ->isAccepted();
     }
 
     public function givenBooking(): Booking
@@ -121,14 +135,17 @@ class BookingDomainServiceTest extends TestCase
         );
     }
 
-    private function givenBookingWithCollision(): Booking
+    private function givenAcceptedBookingWithCollision(): Booking
     {
-        return new Booking(
+        $booking = new Booking(
             self::RENTAL_PLACE_ID,
             self::TENANT_ID_2,
             self::RENTAL_TYPE,
             $this->bookingDatesWithCollision
         );
+
+        $booking->accept($this->createMock(BookingEventsPublisher::class));
+        return $booking;
     }
 
     private function thenBookingAcceptedEventShouldBePublished(): void
@@ -145,13 +162,26 @@ class BookingDomainServiceTest extends TestCase
             ->with(self::RENTAL_TYPE, self::RENTAL_PLACE_ID, self::TENANT_ID_1, $this->bookingDates);
     }
 
-    private function givenBookingWithoutCollision(): Booking
+    private function givenAcceptedBookingWithoutCollision(): Booking
+    {
+        $booking = new Booking(
+            self::RENTAL_PLACE_ID,
+            self::TENANT_ID_2,
+            self::RENTAL_TYPE,
+            $this->bookingDatesWithoutCollision
+        );
+
+        $booking->accept($this->createMock(BookingEventsPublisher::class));
+        return $booking;
+    }
+
+    private function givenOpenBookingWithCollision(): Booking
     {
         return new Booking(
             self::RENTAL_PLACE_ID,
             self::TENANT_ID_2,
             self::RENTAL_TYPE,
-            $this->bookingDatesWithoutCollision
+            $this->bookingDatesWithCollision
         );
     }
 }

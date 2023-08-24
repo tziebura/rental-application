@@ -108,7 +108,7 @@ class Booking
     public function hasCollisionWith(Booking $other): bool
     {
         foreach ($this->dates as $date) {
-            if (in_array($date, $other->dates, true)) {
+            if ($this->status === BookingStatus::ACCEPTED && in_array($date, $other->dates)) {
                 return true;
             }
         }
