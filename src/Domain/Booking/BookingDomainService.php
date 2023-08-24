@@ -13,6 +13,10 @@ class BookingDomainService
 
     public function accept(Booking $booking, array $bookings)
     {
-        $booking->accept($this->bookingEventsPublisher);
+        if (empty($bookings)) {
+            $booking->accept($this->bookingEventsPublisher);
+        } else {
+            $booking->reject();
+        }
     }
 }
