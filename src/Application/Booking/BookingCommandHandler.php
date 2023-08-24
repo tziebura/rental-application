@@ -28,7 +28,7 @@ class BookingCommandHandler implements EventSubscriberInterface
     public function reject(RejectBooking $command): void
     {
         $booking = $this->bookingRepository->findById($command->getId());
-        $booking->reject();
+        $booking->reject($this->bookingEventsPublisher);
 
         $this->bookingRepository->save($booking);
     }

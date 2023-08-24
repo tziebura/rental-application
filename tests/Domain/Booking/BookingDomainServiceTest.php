@@ -78,6 +78,18 @@ class BookingDomainServiceTest extends TestCase
             ->isRejected();
     }
 
+    /**
+     * @test
+     */
+    public function shouldPublisherEventWhenBookingIsRejected(): void
+    {
+        $booking = $this->givenBooking();
+        $bookings = [$this->givenBookingWithCollision()];
+
+        $this->thenBookingRejectedEventShouldBePublished();
+        $this->subject->accept($booking, $bookings);
+    }
+
     public function givenBooking(): Booking
     {
         return new Booking(
@@ -102,6 +114,13 @@ class BookingDomainServiceTest extends TestCase
     {
         $this->bookingEventsPublisher->expects($this->once())
             ->method('publishBookingAccepted')
+            ->with(self::RENTAL_TYPE, self::RENTAL_PLACE_ID, self::TENANT_ID_1, $this->bookingDates);
+    }
+
+    private function thenBookingRejectedEventShouldBePublished(): void
+    {
+        $this->bookingEventsPublisher->expects($this->once())
+            ->method('publishBookingRejected')
             ->with(self::RENTAL_TYPE, self::RENTAL_PLACE_ID, self::TENANT_ID_1, $this->bookingDates);
     }
 }

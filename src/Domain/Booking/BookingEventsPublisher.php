@@ -31,4 +31,15 @@ class BookingEventsPublisher
         ));
     }
 
+    public function publishBookingRejected(string $rentalType, int $rentalPlaceId, string $tenantId, array $dates): void
+    {
+        $this->eventChannel->publish(new BookingRejected(
+            $this->eventIdFactory->create(),
+            $this->eventCreationTimeFactory->create(),
+            $rentalType,
+            $rentalPlaceId,
+            $tenantId,
+            $dates
+        ));
+    }
 }

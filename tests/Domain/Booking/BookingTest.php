@@ -70,7 +70,7 @@ class BookingTest extends TestCase
     public function shouldRejectBooking()
     {
         $actual = $this->givenHotelRoomBooking();
-        $actual->reject();
+        $actual->reject($this->bookingEventsPublisher);
 
         BookingAssertion::assertThat($actual)
             ->isRejected();
@@ -118,7 +118,7 @@ class BookingTest extends TestCase
         $this->expectException(NotAllowedBookingStatusTransitionException::class);
         $this->expectExceptionMessage('Not allowed to transition from ACCEPTED to REJECTED booking.');
 
-        $actual->reject();
+        $actual->reject($this->bookingEventsPublisher);
         BookingAssertion::assertThat($actual)
             ->isAccepted();
     }
@@ -129,7 +129,7 @@ class BookingTest extends TestCase
     public function shouldNotAllowToAcceptAlreadyRejectedBooking(): void
     {
         $actual = $this->givenHotelRoomBooking();
-        $actual->reject();
+        $actual->reject($this->bookingEventsPublisher);
 
         $this->expectException(NotAllowedBookingStatusTransitionException::class);
         $this->expectExceptionMessage('Not allowed to transition from REJECTED to ACCEPTED booking.');

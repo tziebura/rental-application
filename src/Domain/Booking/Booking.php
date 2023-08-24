@@ -73,13 +73,20 @@ class Booking
         );
     }
 
-    public function reject()
+    public function reject(BookingEventsPublisher $bookingEventsPublisher)
     {
         if ($this->status === BookingStatus::ACCEPTED) {
             throw NotAllowedBookingStatusTransitionException::with($this->status, BookingStatus::REJECTED);
         }
 
         $this->status = BookingStatus::REJECTED;
+
+        $bookingEventsPublisher->publishBookingRejected(
+            $this->rentalType,
+            $this->rentalPlaceId,
+            $this->tenantId,
+            $this->dates
+        );
     }
 
     public function accept(BookingEventsPublisher $bookingEventsPublisher)

@@ -16,7 +16,7 @@ class BookingDomainService
         if (empty($bookings)) {
             $booking->accept($this->bookingEventsPublisher);
         } else {
-            $booking->reject();
+            $booking->reject($this->bookingEventsPublisher);
         }
     }
 }
