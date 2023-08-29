@@ -115,4 +115,14 @@ class Booking
 
         return false;
     }
+
+    public function getRentalType(): string
+    {
+        return $this->rentalType;
+    }
+
+    public function getRentalPlaceId(): int
+    {
+        return $this->rentalPlaceId;
+    }
 }

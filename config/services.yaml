@@ -47,3 +47,7 @@ services:
             - '@App\Domain\EventChannel\EventChannel'
 
     App\Domain\HotelRoomOffer\HotelRoomOfferDomainService: ~
+
+    App\Domain\Booking\BookingDomainService:
+        arguments:
+            - '@App\Domain\Booking\BookingEventsPublisher'

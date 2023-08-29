@@ -23,4 +23,12 @@ class SqlBookingRepository implements BookingRepository
     {
         return $this->repository->find($id);
     }
+
+    public function findAllBy(string $rentalType, int $rentalPlaceId): array
+    {
+        return $this->repository->findBy([
+            'rentalType' => $rentalType,
+            'rentalPlaceId' => $rentalPlaceId,
+        ]);
+    }
 }

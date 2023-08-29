@@ -6,9 +6,12 @@ use App\Application\Booking\AcceptBooking;
 use App\Application\Booking\BookingCommandHandler;
 use App\Application\Booking\RejectBooking;
 use App\Domain\Booking\Booking;
+use App\Domain\Booking\BookingDomainService;
 use App\Domain\Booking\BookingEventsPublisher;
 use App\Domain\Booking\BookingRepository;
+use App\Domain\Booking\RentalType;
 use App\Tests\Domain\Booking\BookingAssertion;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class BookingCommandHandlerTest extends TestCase
@@ -30,7 +33,8 @@ class BookingCommandHandlerTest extends TestCase
 
         $this->subject = new BookingCommandHandler(
             $this->repository,
-            $this->bookingEventsPublisher
+            $this->bookingEventsPublisher,
+            new BookingDomainService($this->bookingEventsPublisher)
         );
     }
 
@@ -74,8 +78,9 @@ class BookingCommandHandlerTest extends TestCase
     /**
      * @test
      */
-    public function shouldAcceptBooking(): void
+    public function shouldAcceptBookingWhenBookingWithCollisionNotFound(): void
     {
+        $this->givenBookingsWithoutCollision();
         $this->givenBooking();
         $command = $this->givenAcceptBookingCommand();
 
@@ -84,12 +89,18 @@ class BookingCommandHandlerTest extends TestCase
         $this->thenBookingShouldBeAccepted();
     }
 
-    public function shouldPublishBookingAcceptedEvent(): void
+    /**
+     * @test
+     */
+    public function shouldRejectBookingWhenBookingWithCollisionFound(): void
     {
+        $this->givenBookingsWithCollision();
         $this->givenBooking();
         $command = $this->givenAcceptBookingCommand();
-        $this->thenBookingAcceptedEventShouldBePublished();
+
+        $this->thenShouldSaveBooking();
         $this->subject->accept($command);
+        $this->thenBookingShouldBeRejected();
     }
 
     private function givenAcceptBookingCommand(): AcceptBooking
@@ -109,7 +120,10 @@ class BookingCommandHandlerTest extends TestCase
             self::RENTAL_PLACE_ID,
             self::TENANT_ID,
             self::RENTAL_TYPE,
-            []
+            [
+                new DateTimeImmutable('2023-08-24'),
+                new DateTimeImmutable('2023-08-25'),
+            ]
         );
 
         $this->repository->expects($this->once())
@@ -127,15 +141,47 @@ class BookingCommandHandlerTest extends TestCase
             }));
     }
 
-    private function thenBookingAcceptedEventShouldBePublished(): void
+    private function givenBookingsWithoutCollision(): void
     {
-        $this->bookingEventsPublisher->expects($this->once())
-            ->method('publishBookingAccepted')
-            ->with(
-                self::RENTAL_TYPE,
-                self::RENTAL_PLACE_ID,
-                self::TENANT_ID,
-                []
-            );
+        $days = [
+            new DateTimeImmutable('2023-08-24'),
+            new DateTimeImmutable('2023-08-25'),
+            new DateTimeImmutable('2023-08-26'),
+        ];
+
+        $booking = new Booking(
+            self::RENTAL_PLACE_ID,
+            self::TENANT_ID,
+            self::RENTAL_TYPE,
+            $days
+        );
+
+        $this->repository->expects($this->once())
+            ->method('findAllBy')
+            ->with(RentalType::HOTEL_ROOM, self::RENTAL_PLACE_ID)
+            ->willReturn([$booking]);
+    }
+
+    private function givenBookingsWithCollision(): void
+    {
+        $days = [
+            new DateTimeImmutable('2023-08-24'),
+            new DateTimeImmutable('2023-08-25'),
+            new DateTimeImmutable('2023-08-26'),
+        ];
+
+        $booking = new Booking(
+            self::RENTAL_PLACE_ID,
+            self::TENANT_ID,
+            self::RENTAL_TYPE,
+            $days
+        );
+
+        $booking->accept($this->bookingEventsPublisher);
+
+        $this->repository->expects($this->once())
+            ->method('findAllBy')
+            ->with(RentalType::HOTEL_ROOM, self::RENTAL_PLACE_ID)
+            ->willReturn([$booking]);
     }
 }
