@@ -1,28 +1,23 @@
 <?php
 
-namespace App\Domain\User;
+namespace App\Application\User;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Embeddable()
- */
-class Name
+class UserDTO
 {
-    /**
-     * @ORM\Column()
-     */
+    private string $login;
     private string $firstName;
-
-    /**
-     * @ORM\Column()
-     */
     private string $lastName;
 
-    public function __construct(string $firstName, string $lastName)
+    public function __construct(string $login, string $firstName, string $lastName)
     {
+        $this->login = $login;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
+    }
+
+    public function getLogin(): string
+    {
+        return $this->login;
     }
 
     public function getFirstName(): string

@@ -66,3 +66,9 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Domain/Period'
                 prefix: 'App\Domain\Period'
                 alias: Period
+            User:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Domain/User'
+                prefix: 'App\Domain\User'
+                alias: User

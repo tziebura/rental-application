@@ -15,6 +15,7 @@ services:
     App\Domain\Hotel\HotelRepository: '@App\Infrastructure\Persistence\Sql\Hotel\SqlHotelRepository'
     App\Domain\ApartmentOffer\ApartmentOfferRepository: '@App\Infrastructure\Persistence\Sql\ApartmentOffer\SqlApartmentOfferRepository'
     App\Domain\HotelRoomOffer\HotelRoomOfferRepository: '@App\Infrastructure\Persistence\Sql\HotelRoomOffer\SqlHotelRoomOfferRepository'
+    App\Domain\User\UserRepository: '@App\Infrastructure\Persistence\Sql\User\SqlUserRepository'
 
     App\Framework\Symfony\Extension\RequestDTOResolver:
         arguments:
@@ -51,3 +52,5 @@ services:
     App\Domain\Booking\BookingDomainService:
         arguments:
             - '@App\Domain\Booking\BookingEventsPublisher'
+
+    App\Domain\User\UserFactory: ~

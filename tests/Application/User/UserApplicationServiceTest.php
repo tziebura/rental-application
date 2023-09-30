@@ -3,7 +3,7 @@
 namespace App\Tests\Application\User;
 
 use App\Application\User\UserApplicationService;
-use App\Application\User\UserDto;
+use App\Application\User\UserDTO;
 use App\Domain\User\User;
 use App\Domain\User\UserAlreadyExistsException;
 use App\Domain\User\UserFactory;
@@ -72,11 +72,11 @@ class UserApplicationServiceTest extends TestCase
     }
 
     /**
-     * @return UserDto
+     * @return UserDTO
      */
-    public function givenUserDto(): UserDto
+    public function givenUserDto(): UserDTO
     {
-        return new UserDto(
+        return new UserDTO(
             self::LOGIN,
             self::NAME,
             self::LAST_NAME

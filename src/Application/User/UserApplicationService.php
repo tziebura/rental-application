@@ -16,7 +16,7 @@ class UserApplicationService
         $this->userFactory = $userFactory;
     }
 
-    public function register(UserDto $userDto): void
+    public function register(UserDTO $userDto): void
     {
         $user = $this->userFactory->create(
             $userDto->getLogin(),
