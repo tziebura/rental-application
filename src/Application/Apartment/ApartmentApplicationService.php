@@ -2,10 +2,11 @@
 
 namespace App\Application\Apartment;
 
- use App\Domain\Apartment\ApartmentBuilder;
  use App\Domain\Apartment\ApartmentEventsPublisher;
+ use App\Domain\Apartment\ApartmentFactory;
  use App\Domain\Apartment\ApartmentRepository;
  use App\Domain\Booking\BookingRepository;
+ use App\Domain\Owner\OwnerRepository;
  use App\Domain\Period\Period;
  use DateTimeImmutable;
 
@@ -14,31 +15,24 @@ namespace App\Application\Apartment;
     private ApartmentRepository $apartmentRepository;
     private ApartmentEventsPublisher $apartmentEventsPublisher;
     private BookingRepository $bookingRepository;
+     private OwnerRepository $ownerRepository;
+     private ApartmentFactory $apartmentFactory;
 
      public function __construct(
          ApartmentRepository $apartmentRepository,
          ApartmentEventsPublisher $apartmentEventsPublisher,
+         ApartmentFactory $apartmentFactory,
          BookingRepository $bookingRepository
      ) {
          $this->apartmentRepository = $apartmentRepository;
          $this->apartmentEventsPublisher = $apartmentEventsPublisher;
          $this->bookingRepository = $bookingRepository;
+         $this->apartmentFactory = $apartmentFactory;
      }
 
      public function add(ApartmentDTO $apartmentDTO): void
      {
-        $apartment = ApartmentBuilder::create()
-            ->withStreet($apartmentDTO->getStreet())
-            ->withPostalCode($apartmentDTO->getPostalCode())
-            ->withHouseNumber($apartmentDTO->getHouseNumber())
-            ->withApartmentNumber($apartmentDTO->getApartmentNumber())
-            ->withCity($apartmentDTO->getCity())
-            ->withCountry($apartmentDTO->getCountry())
-            ->withRoomsDefinition($apartmentDTO->getRoomsDefinition())
-            ->withOwnerId($apartmentDTO->getOwnerId())
-            ->withDescription($apartmentDTO->getDescription())
-            ->build();
-
+        $apartment = $this->apartmentFactory->create($apartmentDTO->asNewApartmentDto());
         $this->apartmentRepository->save($apartment);
     }
 

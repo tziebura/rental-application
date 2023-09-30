@@ -1,47 +1,16 @@
 <?php
 
-namespace App\Application\Apartment;
+namespace App\Domain\Apartment;
 
-use App\Domain\Apartment\NewApartmentDto;
-use Symfony\Component\Validator\Constraints as Assert;
-
-class ApartmentDTO
+class NewApartmentDto
 {
     private string $ownerId;
-
-    /**
-     * @Assert\NotBlank()
-     */
     private string $street;
-
-    /**
-     * @Assert\NotBlank()
-     */
     private string $postalCode;
-
-    /**
-     * @Assert\NotBlank()
-     */
     private string $houseNumber;
-
-    /**
-     * @Assert\NotBlank()
-     */
     private string $apartmentNumber;
-
-    /**
-     * @Assert\NotBlank()
-     */
     private string $city;
-
-    /**
-     * @Assert\NotBlank()
-     */
     private string $country;
-
-    /**
-     * @Assert\NotBlank()
-     */
     private string $description;
 
     /**
@@ -110,20 +79,5 @@ class ApartmentDTO
     public function getRoomsDefinition(): array
     {
         return $this->roomsDefinition;
-    }
-
-    public function asNewApartmentDto(): NewApartmentDto
-    {
-        return new NewApartmentDto(
-            $this->ownerId,
-            $this->street,
-            $this->postalCode,
-            $this->houseNumber,
-            $this->apartmentNumber,
-            $this->city,
-            $this->country,
-            $this->description,
-            $this->roomsDefinition
-        );
     }
 }

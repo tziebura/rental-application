@@ -4,12 +4,15 @@ namespace App\Tests\Application\Apartment;
 
 use App\Application\Apartment\ApartmentApplicationService;
 use App\Application\Apartment\ApartmentDTO;
+use App\Application\Apartment\OwnerNotFoundException;
 use App\Domain\Apartment\Apartment;
 use App\Domain\Apartment\ApartmentBuilder;
 use App\Domain\Apartment\ApartmentEventsPublisher;
+use App\Domain\Apartment\ApartmentFactory;
 use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingRepository;
+use App\Domain\Owner\OwnerRepository;
 use App\Domain\Period\Period;
 use App\Tests\Domain\Apartment\ApartmentAssertion;
 use App\Tests\Domain\Booking\BookingAssertion;
@@ -43,10 +46,12 @@ class ApartmentApplicationServiceTest extends TestCase
     private DateTimeImmutable $start;
     private DateTimeImmutable $end;
     private Booking $actualBooking;
+    private OwnerRepository $ownerRepository;
 
     public function setUp(): void
     {
         $this->apartmentRepository = $this->createMock(ApartmentRepository::class);
+        $this->ownerRepository = $this->createMock(OwnerRepository::class);
         $this->apartmentEventsPublisher = $this->createMock(ApartmentEventsPublisher::class);
         $this->bookingRepository = $this->createMock(BookingRepository::class);
         $this->start = new DateTimeImmutable('01-01-2022');
@@ -55,6 +60,7 @@ class ApartmentApplicationServiceTest extends TestCase
         $this->subject = new ApartmentApplicationService(
             $this->apartmentRepository,
             $this->apartmentEventsPublisher,
+            new ApartmentFactory($this->ownerRepository),
             $this->bookingRepository
         );
     }
@@ -62,39 +68,27 @@ class ApartmentApplicationServiceTest extends TestCase
     /**
      * @test
      */
-    public function shouldCreateApartmentWithAllInformation()
+    public function shouldCreateApartmentWithAllInformation(): void
     {
-        $this->apartmentRepository->expects($this->once())
-            ->method('save')
-            ->will($this->returnCallback(function (Apartment $apartment) use (&$actual) {
-                $actual = $apartment;
-            }));
+        $this->givenOwnerExists();
+        $dto = $this->givenApartmentDto();
 
-        $dto = new ApartmentDTO(
-            self::OWNER_ID,
-            self::STREET,
-            self::POSTAL_CODE,
-            self::HOUSE_NUMBER,
-            self::APARTMENT_NUMBER,
-            self::CITY,
-            self::COUNTRY,
-            self::DESCRIPTION,
-            self::ROOMS_DEFINITION
-        );
+        $this->thenApartmentShouldBeSaved();
         $this->subject->add($dto);
+    }
 
-        ApartmentAssertion::assertThat($actual)
-            ->hasOwnerEqualTo(self::OWNER_ID)
-            ->hasDescriptionEqualTo(self::DESCRIPTION)
-            ->hasAddressEqualTo(
-                self::STREET,
-                self::POSTAL_CODE,
-                self::HOUSE_NUMBER,
-                self::APARTMENT_NUMBER,
-                self::CITY,
-                self::COUNTRY,
-            )
-            ->hasRoomsEqualTo(self::ROOMS_DEFINITION);
+    /**
+     * @test
+     */
+    public function shouldShouldRecognizeOwnerDoesNotExist(): void
+    {
+        $this->givenOwnerDoesNotExist();
+        $dto = $this->givenApartmentDto();
+
+        $this->expectException(OwnerNotFoundException::class);
+        $this->thenApartmentShouldNeverBeSaved();
+
+        $this->subject->add($dto);
     }
 
     /**
@@ -168,5 +162,64 @@ class ApartmentApplicationServiceTest extends TestCase
                 self::TENANT_ID,
                 new Period($this->start, $this->end)
             );
+    }
+
+    private function givenOwnerExists(): void
+    {
+        $this->ownerRepository->expects($this->once())
+            ->method('exists')
+            ->with(self::OWNER_ID)
+            ->willReturn(true);
+    }
+
+    private function givenOwnerDoesNotExist(): void
+    {
+        $this->ownerRepository->expects($this->once())
+            ->method('exists')
+            ->with(self::OWNER_ID)
+            ->willReturn(false);
+    }
+
+    private function givenApartmentDto(): ApartmentDTO
+    {
+        return new ApartmentDTO(
+            self::OWNER_ID,
+            self::STREET,
+            self::POSTAL_CODE,
+            self::HOUSE_NUMBER,
+            self::APARTMENT_NUMBER,
+            self::CITY,
+            self::COUNTRY,
+            self::DESCRIPTION,
+            self::ROOMS_DEFINITION
+        );
+    }
+
+    private function thenApartmentShouldBeSaved(): void
+    {
+        $this->apartmentRepository->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (Apartment $actual) {
+                ApartmentAssertion::assertThat($actual)
+                    ->hasOwnerEqualTo(self::OWNER_ID)
+                    ->hasDescriptionEqualTo(self::DESCRIPTION)
+                    ->hasAddressEqualTo(
+                        self::STREET,
+                        self::POSTAL_CODE,
+                        self::HOUSE_NUMBER,
+                        self::APARTMENT_NUMBER,
+                        self::CITY,
+                        self::COUNTRY,
+                    )
+                    ->hasRoomsEqualTo(self::ROOMS_DEFINITION);
+
+                return true;
+            }));
+    }
+
+    private function thenApartmentShouldNeverBeSaved(): void
+    {
+        $this->apartmentRepository->expects($this->never())
+            ->method('save');
     }
 }
