@@ -17,9 +17,6 @@ class UserFactory
             throw UserAlreadyExistsException::withLogin($login);
         }
 
-        return UserBuilder::user()
-            ->withLogin($login)
-            ->withName($firstName, $lastName)
-            ->build();
+        return new User($login, new Name($firstName, $lastName));
     }
 }

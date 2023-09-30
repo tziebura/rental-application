@@ -6,6 +6,7 @@ use App\Application\User\UserApplicationService;
 use App\Application\User\UserDto;
 use App\Domain\User\User;
 use App\Domain\User\UserAlreadyExistsException;
+use App\Domain\User\UserFactory;
 use App\Domain\User\UserRepository;
 use App\Tests\Domain\User\UserAssertion;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +21,7 @@ class UserApplicationServiceTest extends TestCase
     public function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
-        $this->subject = new UserApplicationService($this->userRepository);
+        $this->subject = new UserApplicationService($this->userRepository, new UserFactory($this->userRepository));
     }
 
     /**

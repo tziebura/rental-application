@@ -2,28 +2,23 @@
 
 namespace App\Application\User;
 
-use App\Domain\User\Name;
-use App\Domain\User\User;
-use App\Domain\User\UserAlreadyExistsException;
-use App\Domain\User\UserBuilder;
 use App\Domain\User\UserFactory;
 use App\Domain\User\UserRepository;
 
 class UserApplicationService
 {
     private UserRepository $userRepository;
+    private UserFactory $userFactory;
 
-    /**
-     * @param UserRepository $userRepository
-     */
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserRepository $userRepository, UserFactory $userFactory)
     {
         $this->userRepository = $userRepository;
+        $this->userFactory = $userFactory;
     }
 
     public function register(UserDto $userDto): void
     {
-        $user = (new UserFactory($this->userRepository))->create(
+        $user = $this->userFactory->create(
             $userDto->getLogin(),
             $userDto->getFirstName(),
             $userDto->getLastName()

@@ -2,8 +2,8 @@
 
 namespace App\Tests\Domain\User;
 
+use App\Domain\User\Name;
 use App\Domain\User\User;
-use App\Domain\User\UserBuilder;
 use App\Tests\PrivatePropertyManipulator;
 use PHPUnit\Framework\TestCase;
 
@@ -25,10 +25,7 @@ class UserAssertion
 
     public function represents(string $login, string $firstName, string $lastName): self
     {
-        $expected = UserBuilder::user()
-            ->withLogin($login)
-            ->withName($firstName, $lastName)
-            ->build();
+        $expected = new User($login, new Name($firstName, $lastName));
 
         TestCase::assertEquals($expected, $this->actual);
 
