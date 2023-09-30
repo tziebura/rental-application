@@ -5,8 +5,8 @@ namespace App\Tests\Application\User;
 use App\Application\User\UserApplicationService;
 use App\Application\User\UserDto;
 use App\Domain\User\User;
-use App\Domain\User\UserAssertion;
 use App\Domain\User\UserRepository;
+use App\Tests\Domain\User\UserAssertion;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
