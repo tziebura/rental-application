@@ -3,29 +3,27 @@
 namespace App\Application\Apartment;
 
  use App\Domain\Apartment\ApartmentDomainService;
- use App\Domain\Apartment\ApartmentEventsPublisher;
  use App\Domain\Apartment\ApartmentFactory;
  use App\Domain\Apartment\ApartmentRepository;
  use App\Domain\Booking\BookingRepository;
- use App\Domain\Owner\OwnerRepository;
+
  class ApartmentApplicationService
 {
     private ApartmentRepository $apartmentRepository;
-    private ApartmentEventsPublisher $apartmentEventsPublisher;
-    private BookingRepository $bookingRepository;
-     private OwnerRepository $ownerRepository;
+     private BookingRepository $bookingRepository;
      private ApartmentFactory $apartmentFactory;
+     private  ApartmentDomainService $apartmentDomainService;
 
      public function __construct(
          ApartmentRepository $apartmentRepository,
-         ApartmentEventsPublisher $apartmentEventsPublisher,
          ApartmentFactory $apartmentFactory,
-         BookingRepository $bookingRepository
+         BookingRepository $bookingRepository,
+         ApartmentDomainService $apartmentDomainService
      ) {
          $this->apartmentRepository = $apartmentRepository;
-         $this->apartmentEventsPublisher = $apartmentEventsPublisher;
          $this->bookingRepository = $bookingRepository;
          $this->apartmentFactory = $apartmentFactory;
+         $this->apartmentDomainService = $apartmentDomainService;
      }
 
      public function add(ApartmentDTO $apartmentDTO): void
@@ -36,8 +34,7 @@ namespace App\Application\Apartment;
 
      public function book(ApartmentBookingDTO $apartmentBookingDTO): void
      {
-        $booking = (new ApartmentDomainService($this->apartmentRepository, $this->apartmentEventsPublisher))->book($apartmentBookingDTO->asNewApartmentBookingDto());
-
+        $booking = $this->apartmentDomainService->book($apartmentBookingDTO->asNewApartmentBookingDto());
         $this->bookingRepository->save($booking);
      }
  }

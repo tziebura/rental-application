@@ -125,4 +125,15 @@ class Booking
     {
         return $this->rentalPlaceId;
     }
+
+    public function isFor(Period $period): bool
+    {
+        foreach ($this->dates as $date) {
+            if ($period->contains($date)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Infrastructure\Persistence\Sql\Booking;
 
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingRepository;
+use App\Domain\Booking\BookingStatus;
 
 class SqlBookingRepository implements BookingRepository
 {
@@ -29,6 +30,15 @@ class SqlBookingRepository implements BookingRepository
         return $this->repository->findBy([
             'rentalType' => $rentalType,
             'rentalPlaceId' => $rentalPlaceId,
+        ]);
+    }
+
+    public function findAllAcceptedBy(string $rentalType, int $rentalPlaceId): array
+    {
+        return $this->repository->findBy([
+            'rentalType' => $rentalType,
+            'rentalPlaceId' => $rentalPlaceId,
+            'status' => BookingStatus::ACCEPTED,
         ]);
     }
 }

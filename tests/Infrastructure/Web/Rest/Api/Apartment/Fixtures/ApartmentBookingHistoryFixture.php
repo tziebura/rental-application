@@ -18,7 +18,7 @@ class ApartmentBookingHistoryFixture extends AbstractFixture implements ORMFixtu
             new DateTimeImmutable('01-01-2022'),
             1,
             'tenantId',
-            Period::of(new DateTimeImmutable('01-02-2022'), new DateTimeImmutable('02-02-2022'))
+            new Period(new DateTimeImmutable('01-02-2022'), new DateTimeImmutable('02-02-2022'))
         );
 
         $manager->persist($bookingHistory);

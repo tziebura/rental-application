@@ -4,6 +4,7 @@ namespace App\Tests\Domain\ApartmentBookingHistory;
 
 use App\Domain\ApartmentBookingHistory\ApartmentBooking;
 use App\Domain\Period\Period;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class ApartmentBookingTest extends TestCase
@@ -13,11 +14,11 @@ class ApartmentBookingTest extends TestCase
      */
     public function shouldCreateStartApartmentBookingWithAllRequiredInformation()
     {
-        $bookingDateTime = new \DateTimeImmutable('01-01-2022');
+        $bookingDateTime = new DateTimeImmutable('01-01-2022');
         $ownerId = 'ownerId';
         $tenantId = 'tenantId';
-        $start = new \DateTimeImmutable('01-01-2022');
-        $end = new \DateTimeImmutable('08-01-2022');
+        $start = new DateTimeImmutable();
+        $end = $start->modify('+7days');
 
         $actual = ApartmentBooking::start(
             $bookingDateTime,

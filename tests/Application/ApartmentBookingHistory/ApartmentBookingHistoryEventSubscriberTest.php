@@ -29,8 +29,8 @@ class ApartmentBookingHistoryEventSubscriberTest extends TestCase
 
     public function setUp(): void
     {
-        $start = new DateTimeImmutable('01-01-2022');
-        $end = new DateTimeImmutable('03-01-2022');
+        $start = new DateTimeImmutable();
+        $end = $start->modify('+2days');
         $this->period = new Period($start, $end);
         $this->repository = $this->createMock(ApartmentBookingHistoryRepository::class);
         $this->subject = new ApartmentBookingHistoryEventSubscriber($this->repository);

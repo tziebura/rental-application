@@ -3,6 +3,7 @@
 namespace App\Domain\Period;
 
 use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
 
@@ -23,16 +24,22 @@ class Period
 
     public function __construct(DateTimeImmutable $start, DateTimeImmutable $end)
     {
-        if ($start > $end) {
-            throw new InvalidArgumentException('Start cannot be greater than end.');
-        }
-
         $this->start = $start;
         $this->end = $end;
     }
 
     public static function of(DateTimeImmutable $start, DateTimeImmutable $end): Period
     {
+        $now = (new DateTimeImmutable())->setTime(0, 0);
+
+        if ($start < $now) {
+            throw PeriodException::startDateFromPast($start);
+        }
+
+        if ($start > $end) {
+            throw PeriodException::startDateAfterEndDate($start, $end);
+        }
+
         return new self(
             $start,
             $end
@@ -63,5 +70,21 @@ class Period
         }
 
         return $days;
+    }
+
+    public function contains(DateTimeInterface $date): bool
+    {
+        $days = $this->asDays();
+
+        foreach ($days as $day) {
+            $dayAsDate = $day->format('Y-m-d');
+            $dateString = $date->format('Y-m-d');
+
+            if ($dayAsDate === $dateString) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

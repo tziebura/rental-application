@@ -22,9 +22,11 @@ class ApartmentBookingHistoryTest extends TestCase
         $bookingDateTime = new DateTimeImmutable('01-01-2022');
         $ownerId = 'ownerId';
         $tenantId = 'tenantId';
+        $start =  new DateTimeImmutable();
+        $end = $start->modify('+2days');
         $bookingPeriod = Period::of(
-            new DateTimeImmutable('01-02-2022'),
-            new DateTimeImmutable('03-02-2022'),
+            $start,
+            $end
         );
 
         $actual->addBookingStart(

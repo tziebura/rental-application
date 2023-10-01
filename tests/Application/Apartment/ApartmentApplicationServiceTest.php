@@ -6,16 +6,23 @@ use App\Application\Apartment\ApartmentApplicationService;
 use App\Application\Apartment\ApartmentBookingDTO;
 use App\Application\Apartment\ApartmentDTO;
 use App\Application\Apartment\OwnerNotFoundException;
+use App\Domain\Apartment\ApartmentBookingException;
+use App\Domain\Apartment\ApartmentDomainService;
+use App\Domain\Booking\RentalType;
+use App\Domain\Period\PeriodException;
+use App\Domain\Tenant\TenantNotFoundException;
 use App\Domain\Apartment\Apartment;
 use App\Domain\Apartment\ApartmentBuilder;
 use App\Domain\Apartment\ApartmentEventsPublisher;
 use App\Domain\Apartment\ApartmentFactory;
+use App\Domain\Apartment\ApartmentNotFoundException;
 use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingRepository;
 use App\Domain\Owner\OwnerRepository;
 use App\Domain\Period\Period;
 use App\Domain\Space\SquareMeterException;
+use App\Domain\Tenant\TenantRepository;
 use App\Tests\Domain\Apartment\ApartmentAssertion;
 use App\Tests\Domain\Booking\BookingAssertion;
 use App\Tests\PrivatePropertyManipulator;
@@ -47,23 +54,33 @@ class ApartmentApplicationServiceTest extends TestCase
     private ApartmentApplicationService $subject;
     private DateTimeImmutable $start;
     private DateTimeImmutable $end;
-    private Booking $actualBooking;
     private OwnerRepository $ownerRepository;
+    private TenantRepository $tenantRepository;
+    private DateTimeImmutable $beforeStart;
+    private DateTimeImmutable $afterStart;
 
     public function setUp(): void
     {
         $this->apartmentRepository = $this->createMock(ApartmentRepository::class);
         $this->ownerRepository = $this->createMock(OwnerRepository::class);
+        $this->tenantRepository = $this->createMock(TenantRepository::class);
         $this->apartmentEventsPublisher = $this->createMock(ApartmentEventsPublisher::class);
         $this->bookingRepository = $this->createMock(BookingRepository::class);
-        $this->start = new DateTimeImmutable('01-01-2022');
-        $this->end = new DateTimeImmutable('02-01-2022');
+        $this->start = new DateTimeImmutable();
+        $this->end = $this->start->modify('+1days');
+        $this->beforeStart = $this->start->modify('-1days');
+        $this->afterStart = $this->start->modify('+1days');
 
         $this->subject = new ApartmentApplicationService(
             $this->apartmentRepository,
-            $this->apartmentEventsPublisher,
             new ApartmentFactory($this->ownerRepository),
-            $this->bookingRepository
+            $this->bookingRepository,
+            new ApartmentDomainService(
+                $this->apartmentRepository,
+                $this->apartmentEventsPublisher,
+                $this->tenantRepository,
+                $this->bookingRepository
+            )
         );
     }
 
@@ -132,11 +149,12 @@ class ApartmentApplicationServiceTest extends TestCase
      */
     public function shouldCreateBookingWhenApartmentBooked()
     {
-        $this->givenApartment();
+        $this->givenApartmentExists();
+        $this->givenTenantExists();
+        $this->givenNoBookings();
 
         $this->thenShouldSaveBooking();
         $this->subject->book($this->givenApartmentBookingDto());
-        $this->thenBookingShouldBeCreated();
     }
 
     /**
@@ -144,12 +162,140 @@ class ApartmentApplicationServiceTest extends TestCase
      */
     public function shouldPublishApartmentBookedEvent(): void
     {
-        $this->givenApartment();
+        $this->givenApartmentExists();
+        $this->givenTenantExists();
+        $this->givenNoBookings();
+
         $this->thenShouldPublishApartmentBookedEvent();
         $this->subject->book($this->givenApartmentBookingDto());
     }
 
-    private function givenApartment()
+    /**
+     * @test
+     */
+    public function shouldRecognizeApartmentDoesNotExistWhenBooking(): void
+    {
+        $this->givenApartmentDoesNotExist();
+        $dto = $this->givenApartmentBookingDto();
+
+        $this->expectException(ApartmentNotFoundException::class);
+
+        $this->thenBookingShouldNeverBeSaved();
+        $this->thenShouldNeverPublishApartmentBookedEvent();
+
+        $this->subject->book($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeTenantDoesNotExistWhenBooking(): void
+    {
+        $this->givenApartmentExists();
+        $this->givenTenantDoesNotExist();
+
+        $dto = $this->givenApartmentBookingDto();
+
+        $this->expectException(TenantNotFoundException::class);
+
+        $this->thenBookingShouldNeverBeSaved();
+        $this->thenShouldNeverPublishApartmentBookedEvent();
+
+        $this->subject->book($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeWhenHaveBookingsWithGivenPeriod(): void
+    {
+        $this->givenApartmentExists();
+        $this->givenTenantExists();
+        $this->givenAcceptedBookingInGivenPeriod();
+
+        $dto = $this->givenApartmentBookingDto();
+
+        $this->expectException(ApartmentBookingException::class);
+        $this->expectExceptionMessage('There are accepted booking in given period.');
+
+        $this->thenBookingShouldNeverBeSaved();
+        $this->thenShouldNeverPublishApartmentBookedEvent();
+
+        $this->subject->book($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldAllowToBookApartmentWhenFoundAcceptedBookingsInDifferentPeriod(): void
+    {
+        $this->givenApartmentExists();
+        $this->givenTenantExists();
+        $this->givenAcceptedBookingInDifferentPeriod();
+
+        $dto = $this->givenApartmentBookingDto();
+
+        $this->thenShouldSaveBooking();
+        $this->thenShouldPublishApartmentBookedEvent();
+
+        $this->subject->book($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeWhenStartDateIsFromPastWhenBooking(): void
+    {
+        $this->givenApartmentExists();
+        $this->givenTenantExists();
+        $this->givenNoBookings();
+
+        $dto = new ApartmentBookingDTO(
+            self::APARTMENT_ID,
+            self::TENANT_ID,
+            new DateTimeImmutable('2023-09-30'),
+            $this->end
+        );
+
+        $this->expectException(PeriodException::class);
+        $this->expectExceptionMessage('Start date: 2023-09-30 is from the past.');
+
+        $this->thenBookingShouldNeverBeSaved();
+        $this->thenShouldNeverPublishApartmentBookedEvent();
+
+        $this->subject->book($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeWhenEndDateIsBeforeStartDateWhenBooking(): void
+    {
+        $this->givenApartmentExists();
+        $this->givenTenantExists();
+        $this->givenNoBookings();
+
+        $dto = new ApartmentBookingDTO(
+            self::APARTMENT_ID,
+            self::TENANT_ID,
+            $this->end,
+            $this->start
+        );
+
+        $this->expectException(PeriodException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Start date: %s of period is after end date: %s.',
+            $this->end->format('Y-m-d'),
+            $this->start->format('Y-m-d')
+        ));
+
+        $this->thenBookingShouldNeverBeSaved();
+        $this->thenShouldNeverPublishApartmentBookedEvent();
+
+        $this->subject->book($dto);
+    }
+
+    private function givenApartmentExists()
     {
         $apartment = ApartmentBuilder::create()
             ->withStreet(self::STREET)
@@ -174,18 +320,15 @@ class ApartmentApplicationServiceTest extends TestCase
     {
         $this->bookingRepository->expects($this->once())
             ->method('save')
-            ->will($this->returnCallback(function (Booking $booking) {
-                $this->actualBooking = $booking;
-            }));
-    }
+            ->with($this->callback(function (Booking $actual) {
+                BookingAssertion::assertThat($actual)
+                    ->hasDaysEqualTo([$this->start, $this->end])
+                    ->isApartmentBooking()
+                    ->hasTenantIdEqualTo(self::TENANT_ID)
+                    ->hasRentalPlaceIdEqualTo(self::APARTMENT_ID);
 
-    private function thenBookingShouldBeCreated()
-    {
-        BookingAssertion::assertThat($this->actualBooking)
-            ->hasDaysEqualTo([$this->start, $this->end])
-            ->isApartmentBooking()
-            ->hasTenantIdEqualTo(self::TENANT_ID)
-            ->hasRentalPlaceIdEqualTo(self::APARTMENT_ID);
+                return true;
+            }));
     }
 
     private function thenShouldPublishApartmentBookedEvent(): void
@@ -267,5 +410,77 @@ class ApartmentApplicationServiceTest extends TestCase
             $this->start,
             $this->end
         );
+    }
+
+    private function givenApartmentDoesNotExist(): void
+    {
+        $this->apartmentRepository->expects($this->once())
+            ->method('findById')
+            ->with(self::APARTMENT_ID)
+            ->willReturn(null);
+    }
+
+    private function thenBookingShouldNeverBeSaved(): void
+    {
+        $this->bookingRepository->expects($this->never())
+            ->method('save');
+    }
+
+    private function thenShouldNeverPublishApartmentBookedEvent()
+    {
+        $this->apartmentEventsPublisher->expects($this->never())
+            ->method('publishApartmentBooked');
+    }
+
+    private function givenTenantExists(): void
+    {
+        $this->tenantRepository->expects($this->once())
+            ->method('exists')
+            ->with(self::TENANT_ID)
+            ->willReturn(true);
+    }
+
+    private function givenTenantDoesNotExist(): void
+    {
+        $this->tenantRepository->expects($this->once())
+            ->method('exists')
+            ->with(self::TENANT_ID)
+            ->willReturn(false);
+    }
+
+    private function givenNoBookings(): void
+    {
+        $this->bookingRepository->expects($this->once())
+            ->method('findAllAcceptedBy')
+            ->with(RentalType::APARTMENT, self::APARTMENT_ID)
+            ->willReturn([]);
+    }
+
+    private function givenAcceptedBookingInGivenPeriod(): void
+    {
+        $booking = Booking::apartment(
+            self::APARTMENT_ID,
+            self::TENANT_ID,
+            new Period($this->beforeStart, $this->afterStart)
+        );
+
+        $this->bookingRepository->expects($this->once())
+            ->method('findAllAcceptedBy')
+            ->with(RentalType::APARTMENT, self::APARTMENT_ID)
+            ->willReturn([$booking]);
+    }
+
+    private function givenAcceptedBookingInDifferentPeriod()
+    {
+        $booking = Booking::apartment(
+            self::APARTMENT_ID,
+            self::TENANT_ID,
+            new Period($this->beforeStart->modify('-10days'), $this->beforeStart)
+        );
+
+        $this->bookingRepository->expects($this->once())
+            ->method('findAllAcceptedBy')
+            ->with(RentalType::APARTMENT, self::APARTMENT_ID)
+            ->willReturn([$booking]);
     }
 }

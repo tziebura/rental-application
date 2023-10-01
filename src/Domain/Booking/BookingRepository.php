@@ -13,4 +13,11 @@ interface BookingRepository
      * @return Booking[]
      */
     public function findAllBy(string $rentalType, int $rentalPlaceId): array;
+
+    /**
+     * @param string $rentalType
+     * @param int $rentalPlaceId
+     * @return Booking[]
+     */
+    public function findAllAcceptedBy(string $rentalType, int $rentalPlaceId): array;
 }
