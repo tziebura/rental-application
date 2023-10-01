@@ -16,6 +16,10 @@ class SquareMeter
 
     public function __construct(float $size)
     {
+        if ($size <= 0) {
+            throw new SquareMeterException();
+        }
+
         $this->size = $size;
     }
 }

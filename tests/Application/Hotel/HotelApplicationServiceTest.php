@@ -12,7 +12,7 @@ use App\Domain\Hotel\Hotel;
 use App\Domain\Hotel\HotelEventsPublisher;
 use App\Domain\Hotel\HotelFactory;
 use App\Domain\Hotel\HotelRepository;
-use App\Domain\Hotel\HotelRoom;
+use App\Domain\Space\SquareMeterException;
 use App\Tests\Domain\Booking\BookingAssertion;
 use App\Tests\Domain\Hotel\HotelAssertion;
 use App\Tests\Domain\Hotel\HotelRoomAssertion;
@@ -100,17 +100,46 @@ class HotelApplicationServiceTest extends TestCase
     public function shouldAddHotelRoomWithAllInformation(): void
     {
         $this->givenHotelExists();
+        $dto = $this->givenHotelRoomDto(self::ROOMS);
 
         $this->thenHotelShouldHaveHotelRoom();
 
-        $this->subject->addHotelRoom(new HotelRoomDTO(
-                self::HOTEL_ID,
-                self::ROOM_NUMBER,
-                self::DESCRIPTION,
-                self::ROOMS
-        ));
+        $this->subject->addHotelRoom($dto);
     }
 
+    /**
+     * @test
+     */
+    public function shouldNotAllowToCreateHotelRoomWithAtLeastOneSpaceThatHasSquareMeterEqualZero(): void
+    {
+        $roomsDefinition = self::ROOMS;
+        $roomsDefinition['zeroRoom'] = 0;
+
+        $this->givenHotelExists();
+        $dto = $this->givenHotelRoomDto($roomsDefinition);
+
+        $this->expectException(SquareMeterException::class);
+        $this->thenHotelRoomShouldNeverBeSaved();
+
+        $this->subject->addHotelRoom($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotAllowToCreateHotelRoomWithAtLeastOneSpaceThatHasSquareMeterLessThanZero(): void
+    {
+        $roomsDefinition = self::ROOMS;
+        $roomsDefinition['lessThanZeroRoom'] = -1;
+
+        $this->givenHotelExists();
+        $dto = $this->givenHotelRoomDto($roomsDefinition);
+
+        $this->expectException(SquareMeterException::class);
+        $this->thenHotelRoomShouldNeverBeSaved();
+
+        $this->subject->addHotelRoom($dto);
+    }
     /**
      * @test
      */
@@ -216,5 +245,21 @@ class HotelApplicationServiceTest extends TestCase
 
         $this->setByReflection($hotel, 'id', (int) self::HOTEL_ID);
         return $hotel;
+    }
+
+    private function givenHotelRoomDto(array $roomsDefinition): HotelRoomDTO
+    {
+        return new HotelRoomDTO(
+            self::HOTEL_ID,
+            self::ROOM_NUMBER,
+            self::DESCRIPTION,
+            $roomsDefinition
+        );
+    }
+
+    private function thenHotelRoomShouldNeverBeSaved(): void
+    {
+        $this->hotelRepository->expects($this->never())
+            ->method('save');
     }
 }

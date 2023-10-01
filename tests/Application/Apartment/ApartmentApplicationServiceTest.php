@@ -14,6 +14,7 @@ use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingRepository;
 use App\Domain\Owner\OwnerRepository;
 use App\Domain\Period\Period;
+use App\Domain\Space\SquareMeterException;
 use App\Tests\Domain\Apartment\ApartmentAssertion;
 use App\Tests\Domain\Booking\BookingAssertion;
 use App\Tests\PrivatePropertyManipulator;
@@ -71,7 +72,7 @@ class ApartmentApplicationServiceTest extends TestCase
     public function shouldCreateApartmentWithAllInformation(): void
     {
         $this->givenOwnerExists();
-        $dto = $this->givenApartmentDto();
+        $dto = $this->givenApartmentDto(self::ROOMS_DEFINITION);
 
         $this->thenApartmentShouldBeSaved();
         $this->subject->add($dto);
@@ -80,12 +81,46 @@ class ApartmentApplicationServiceTest extends TestCase
     /**
      * @test
      */
-    public function shouldShouldRecognizeOwnerDoesNotExist(): void
+    public function shouldRecognizeOwnerDoesNotExist(): void
     {
         $this->givenOwnerDoesNotExist();
-        $dto = $this->givenApartmentDto();
+        $dto = $this->givenApartmentDto(self::ROOMS_DEFINITION);
 
         $this->expectException(OwnerNotFoundException::class);
+        $this->thenApartmentShouldNeverBeSaved();
+
+        $this->subject->add($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotAllowToCreateApartmentWithAtLeastOneSpaceThatHasSquareMeterEqualZero(): void
+    {
+        $roomsDefinition = self::ROOMS_DEFINITION;
+        $roomsDefinition['zeroRoom'] = 0;
+
+        $this->givenOwnerExists();
+        $dto = $this->givenApartmentDto($roomsDefinition);
+
+        $this->expectException(SquareMeterException::class);
+        $this->thenApartmentShouldNeverBeSaved();
+
+        $this->subject->add($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotAllowToCreateApartmentWithAtLeastOneSpaceThatHasSquareMeterLessThanZero(): void
+    {
+        $roomsDefinition = self::ROOMS_DEFINITION;
+        $roomsDefinition['lessThanZeroRoom'] = -1;
+
+        $this->givenOwnerExists();
+        $dto = $this->givenApartmentDto($roomsDefinition);
+
+        $this->expectException(SquareMeterException::class);
         $this->thenApartmentShouldNeverBeSaved();
 
         $this->subject->add($dto);
@@ -180,7 +215,7 @@ class ApartmentApplicationServiceTest extends TestCase
             ->willReturn(false);
     }
 
-    private function givenApartmentDto(): ApartmentDTO
+    private function givenApartmentDto(array $roomsDefinition): ApartmentDTO
     {
         return new ApartmentDTO(
             self::OWNER_ID,
@@ -191,7 +226,7 @@ class ApartmentApplicationServiceTest extends TestCase
             self::CITY,
             self::COUNTRY,
             self::DESCRIPTION,
-            self::ROOMS_DEFINITION
+            $roomsDefinition
         );
     }
 
