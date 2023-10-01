@@ -7,6 +7,7 @@ use App\Application\ApartmentOffer\ApartmentOfferService;
 use App\Domain\Apartment\ApartmentNotFoundException;
 use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\ApartmentOffer\ApartmentOffer;
+use App\Domain\ApartmentOffer\ApartmentOfferFactory;
 use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Domain\Money\NotAllowedMoneyValueException;
 use App\Domain\RentalPlaceAvailability\RentalPlaceAvailabilityException;
@@ -37,7 +38,7 @@ class ApartmentOfferServiceTest extends TestCase
 
         $this->subject = new ApartmentOfferService(
             $this->apartmentOfferRepository,
-            $this->apartmentRepository
+            new ApartmentOfferFactory($this->apartmentRepository)
         );
     }
 
