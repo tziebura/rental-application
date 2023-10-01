@@ -2,14 +2,12 @@
 
 namespace App\Application\Apartment;
 
+ use App\Domain\Apartment\ApartmentDomainService;
  use App\Domain\Apartment\ApartmentEventsPublisher;
  use App\Domain\Apartment\ApartmentFactory;
  use App\Domain\Apartment\ApartmentRepository;
  use App\Domain\Booking\BookingRepository;
  use App\Domain\Owner\OwnerRepository;
- use App\Domain\Period\Period;
- use DateTimeImmutable;
-
  class ApartmentApplicationService
 {
     private ApartmentRepository $apartmentRepository;
@@ -36,12 +34,9 @@ namespace App\Application\Apartment;
         $this->apartmentRepository->save($apartment);
     }
 
-     public function book(string $id, string $tenantId, DateTimeImmutable $start, DateTimeImmutable $end): void
+     public function book(ApartmentBookingDTO $apartmentBookingDTO): void
      {
-        $apartment = $this->apartmentRepository->findById($id);
-        $period = Period::of($start, $end);
-
-        $booking = $apartment->book($tenantId, $period, $this->apartmentEventsPublisher);
+        $booking = (new ApartmentDomainService($this->apartmentRepository, $this->apartmentEventsPublisher))->book($apartmentBookingDTO->asNewApartmentBookingDto());
 
         $this->bookingRepository->save($booking);
      }

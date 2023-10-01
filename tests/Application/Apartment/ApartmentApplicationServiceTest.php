@@ -3,6 +3,7 @@
 namespace App\Tests\Application\Apartment;
 
 use App\Application\Apartment\ApartmentApplicationService;
+use App\Application\Apartment\ApartmentBookingDTO;
 use App\Application\Apartment\ApartmentDTO;
 use App\Application\Apartment\OwnerNotFoundException;
 use App\Domain\Apartment\Apartment;
@@ -134,7 +135,7 @@ class ApartmentApplicationServiceTest extends TestCase
         $this->givenApartment();
 
         $this->thenShouldSaveBooking();
-        $this->subject->book(self::APARTMENT_ID, self::TENANT_ID, $this->start, $this->end);
+        $this->subject->book($this->givenApartmentBookingDto());
         $this->thenBookingShouldBeCreated();
     }
 
@@ -145,7 +146,7 @@ class ApartmentApplicationServiceTest extends TestCase
     {
         $this->givenApartment();
         $this->thenShouldPublishApartmentBookedEvent();
-        $this->subject->book(self::APARTMENT_ID, self::TENANT_ID, $this->start, $this->end);
+        $this->subject->book($this->givenApartmentBookingDto());
     }
 
     private function givenApartment()
@@ -256,5 +257,15 @@ class ApartmentApplicationServiceTest extends TestCase
     {
         $this->apartmentRepository->expects($this->never())
             ->method('save');
+    }
+
+    private function givenApartmentBookingDto(): ApartmentBookingDTO
+    {
+        return new ApartmentBookingDTO(
+            self::APARTMENT_ID,
+            self::TENANT_ID,
+            $this->start,
+            $this->end
+        );
     }
 }

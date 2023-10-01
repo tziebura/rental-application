@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Web\Rest\Api\Apartment;
 
 use App\Application\Apartment\ApartmentApplicationService;
+use App\Application\Apartment\ApartmentBookingDTO;
 use App\Application\Apartment\ApartmentDTO;
 use App\Query\Apartment\ApartmentReadModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -68,13 +69,7 @@ class ApartmentController extends AbstractController
      * @Route(path="/book/{id}", name="book", methods={"PUT"})
      */
     public function book(string $id, ApartmentBookingDTO $apartmentBookingDto): Response {
-        $this->apartmentApplicationService->book(
-            $id,
-            $apartmentBookingDto->getTenantId(),
-            $apartmentBookingDto->getStart(),
-            $apartmentBookingDto->getEnd()
-        );
-
+        $this->apartmentApplicationService->book($apartmentBookingDto);
         return new JsonResponse([], Response::HTTP_OK);
     }
 }
