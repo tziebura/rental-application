@@ -72,3 +72,9 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Domain/User'
                 prefix: 'App\Domain\User'
                 alias: User
+            Money:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Domain/Money'
+                prefix: 'App\Domain\Money'
+                alias: Money

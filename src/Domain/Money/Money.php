@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\HotelRoomOffer;
+namespace App\Domain\Money;
 
 use Doctrine\ORM\Mapping as ORM;
 

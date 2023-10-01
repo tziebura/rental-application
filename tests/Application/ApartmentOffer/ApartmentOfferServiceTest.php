@@ -9,7 +9,7 @@ use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\ApartmentOffer\ApartmentAvailabilityException;
 use App\Domain\ApartmentOffer\ApartmentOffer;
 use App\Domain\ApartmentOffer\ApartmentOfferRepository;
-use App\Domain\ApartmentOffer\NotAllowedMoneyValueException;
+use App\Domain\Money\NotAllowedMoneyValueException;
 use App\Tests\Domain\ApartmentOffer\ApartmentOfferAssertion;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
@@ -69,19 +69,19 @@ class ApartmentOfferServiceTest extends TestCase
     /**
      * @test
      */
-    public function shouldRecognizePriceLowerThanZero(): void
+    public function shouldRecognizePriceIsNotGreaterThanZero(): void
     {
         $this->givenApartmentExists();
 
         $dto = new ApartmentOfferDTO(
             self::APARTMENT_ID,
-            -13.0,
+            0,
             $this->start,
             $this->end
         );
 
         $this->expectException(NotAllowedMoneyValueException::class);
-        $this->expectExceptionMessage('Price -13 is lower than zero.');
+        $this->expectExceptionMessage('Price 0 is not greater than zero.');
 
         $this->subject->add($dto);
     }
@@ -107,23 +107,6 @@ class ApartmentOfferServiceTest extends TestCase
             $this->start->format('Y-m-d'),
         ));
 
-        $this->subject->add($dto);
-    }
-
-    /**
-     * @test
-     */
-    public function shouldCreateApartmentOfferWithZeroPrice(): void
-    {
-        $this->givenApartmentExists();
-        $dto = new ApartmentOfferDTO(
-            self::APARTMENT_ID,
-            0.0,
-            $this->start,
-            $this->end
-        );
-
-        $this->thenApartmentOfferShouldBeAdded(0.0, $this->start, $this->end);
         $this->subject->add($dto);
     }
 

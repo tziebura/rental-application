@@ -2,6 +2,7 @@
 
 namespace App\Domain\HotelRoomOffer;
 
+use App\Domain\Money\Money;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,7 +29,7 @@ class HotelRoomOffer
     private int $hotelRoomNumber;
 
     /**
-     * @ORM\Embedded(class="App\Domain\HotelRoomOffer\Money")
+     * @ORM\Embedded(class="App\Domain\Money\Money")
      */
     private Money $price;
 

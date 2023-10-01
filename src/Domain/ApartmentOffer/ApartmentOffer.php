@@ -2,6 +2,7 @@
 
 namespace App\Domain\ApartmentOffer;
 
+use App\Domain\Money\Money;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -23,7 +24,7 @@ class ApartmentOffer
     private string $apartmentId;
 
     /**
-     * @ORM\Embedded(class="App\Domain\ApartmentOffer\Money")
+     * @ORM\Embedded(class="App\Domain\Money\Money")
      */
     private Money $price;
 

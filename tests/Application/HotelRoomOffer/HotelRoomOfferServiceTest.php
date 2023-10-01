@@ -12,7 +12,7 @@ use App\Domain\HotelRoomOffer\HotelRoomAvailabilityException;
 use App\Domain\HotelRoomOffer\HotelRoomOffer;
 use App\Domain\HotelRoomOffer\HotelRoomOfferDomainService;
 use App\Domain\HotelRoomOffer\HotelRoomOfferRepository;
-use App\Domain\HotelRoomOffer\NotAllowedMoneyValueException;
+use App\Domain\Money\NotAllowedMoneyValueException;
 use App\Tests\Domain\HotelRoomOffer\HotelRoomOfferAssertion;
 use App\Tests\PrivatePropertyManipulator;
 use DateTimeImmutable;

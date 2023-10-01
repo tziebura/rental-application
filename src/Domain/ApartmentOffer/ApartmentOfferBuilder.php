@@ -2,6 +2,7 @@
 
 namespace App\Domain\ApartmentOffer;
 
+use App\Domain\Money\Money;
 use DateTimeImmutable;
 use stdClass;
 
