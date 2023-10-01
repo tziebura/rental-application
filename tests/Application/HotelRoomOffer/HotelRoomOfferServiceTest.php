@@ -116,7 +116,7 @@ class HotelRoomOfferServiceTest extends TestCase
         );
 
         $this->expectException(NotAllowedMoneyValueException::class);
-        $this->expectExceptionMessage('Price 0 is lower than or equal to zero.');
+        $this->expectExceptionMessage('Price 0 is not greater than zero.');
 
         $this->subject->add($dto);
     }
