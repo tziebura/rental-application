@@ -3,6 +3,7 @@
 namespace App\Domain\ApartmentOffer;
 
 use App\Domain\Money\Money;
+use App\Domain\RentalPlaceAvailability\RentalPlaceAvailability;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -29,11 +30,11 @@ class ApartmentOffer
     private Money $price;
 
     /**
-     * @ORM\Embedded(class="App\Domain\ApartmentOffer\ApartmentAvailability")
+     * @ORM\Embedded(class="App\Domain\RentalPlaceAvailability\RentalPlaceAvailability")
      */
-    private ApartmentAvailability $availability;
+    private RentalPlaceAvailability $availability;
 
-    public function __construct(string $apartmentId, Money $price, ApartmentAvailability $availability)
+    public function __construct(string $apartmentId, Money $price, RentalPlaceAvailability $availability)
     {
         $this->apartmentId = $apartmentId;
         $this->price = $price;

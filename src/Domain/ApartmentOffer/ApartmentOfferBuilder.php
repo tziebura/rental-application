@@ -3,6 +3,7 @@
 namespace App\Domain\ApartmentOffer;
 
 use App\Domain\Money\Money;
+use App\Domain\RentalPlaceAvailability\RentalPlaceAvailability;
 use DateTimeImmutable;
 use stdClass;
 
@@ -44,7 +45,7 @@ class ApartmentOfferBuilder
         $offer = new ApartmentOffer(
             $this->carry->apartmentId,
             Money::of($this->carry->price),
-            ApartmentAvailability::of($this->carry->start, $this->carry->end)
+            RentalPlaceAvailability::of($this->carry->start, $this->carry->end)
         );
 
         $this->carry = new stdClass();

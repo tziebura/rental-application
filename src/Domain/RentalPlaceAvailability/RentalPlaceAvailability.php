@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\ApartmentOffer;
+namespace App\Domain\RentalPlaceAvailability;
 
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Embeddable()
  */
-class ApartmentAvailability
+class RentalPlaceAvailability
 {
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -32,7 +32,13 @@ class ApartmentAvailability
         $end = $end->setTime(0, 0);
 
         if ($start > $end) {
-            throw ApartmentAvailabilityException::startAfterEnd($start, $end);
+            throw RentalPlaceAvailabilityException::startAfterEnd($start, $end);
+        }
+
+        $today = (new DateTimeImmutable())->setTime(0, 0);
+
+        if ($start < $today) {
+            throw RentalPlaceAvailabilityException::startEarlierThanToday($start);
         }
 
         return new self($start, $end);

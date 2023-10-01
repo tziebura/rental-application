@@ -6,10 +6,10 @@ use App\Application\ApartmentOffer\ApartmentOfferDTO;
 use App\Application\ApartmentOffer\ApartmentOfferService;
 use App\Domain\Apartment\ApartmentNotFoundException;
 use App\Domain\Apartment\ApartmentRepository;
-use App\Domain\ApartmentOffer\ApartmentAvailabilityException;
 use App\Domain\ApartmentOffer\ApartmentOffer;
 use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Domain\Money\NotAllowedMoneyValueException;
+use App\Domain\RentalPlaceAvailability\RentalPlaceAvailabilityException;
 use App\Tests\Domain\ApartmentOffer\ApartmentOfferAssertion;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
@@ -31,8 +31,9 @@ class ApartmentOfferServiceTest extends TestCase
         $this->apartmentOfferRepository = $this->createMock(ApartmentOfferRepository::class);
         $this->apartmentRepository = $this->createMock(ApartmentRepository::class);
 
-        $this->start = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-06');
-        $this->end = DateTimeImmutable::createFromFormat('Y-m-d', '2023-08-20');
+        $now = (new DateTimeImmutable())->setTime(0, 0);
+        $this->start = $now;
+        $this->end = $now->modify('+3days');
 
         $this->subject = new ApartmentOfferService(
             $this->apartmentOfferRepository,
@@ -100,11 +101,37 @@ class ApartmentOfferServiceTest extends TestCase
             $this->start
         );
 
-        $this->expectException(ApartmentAvailabilityException::class);
+        $this->expectException(RentalPlaceAvailabilityException::class);
         $this->expectExceptionMessage(sprintf(
             'Start date %s of availability is after end date %s.',
             $this->end->format('Y-m-d'),
             $this->start->format('Y-m-d'),
+        ));
+
+        $this->subject->add($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeStartDateEarlierThanToday(): void
+    {
+        $start = (new DateTimeImmutable())->modify('-1days');
+        $end = (new DateTimeImmutable())->modify('+14days');
+
+        $this->givenApartmentExists();
+
+        $dto = new ApartmentOfferDTO(
+            self::APARTMENT_ID,
+            100.0,
+            $start,
+            $end
+        );
+
+        $this->expectException(RentalPlaceAvailabilityException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Start date must be at least today, %s given.',
+            $start->format('Y-m-d'),
         ));
 
         $this->subject->add($dto);

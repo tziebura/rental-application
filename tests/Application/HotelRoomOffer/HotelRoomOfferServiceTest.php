@@ -8,11 +8,11 @@ use App\Domain\Hotel\Hotel;
 use App\Domain\Hotel\HotelFactory;
 use App\Domain\Hotel\HotelRepository;
 use App\Domain\Hotel\HotelRoomNotFoundException;
-use App\Domain\HotelRoomOffer\HotelRoomAvailabilityException;
 use App\Domain\HotelRoomOffer\HotelRoomOffer;
 use App\Domain\HotelRoomOffer\HotelRoomOfferDomainService;
 use App\Domain\HotelRoomOffer\HotelRoomOfferRepository;
 use App\Domain\Money\NotAllowedMoneyValueException;
+use App\Domain\RentalPlaceAvailability\RentalPlaceAvailabilityException;
 use App\Tests\Domain\HotelRoomOffer\HotelRoomOfferAssertion;
 use App\Tests\PrivatePropertyManipulator;
 use DateTimeImmutable;
@@ -135,7 +135,7 @@ class HotelRoomOfferServiceTest extends TestCase
             $this->start
         );
 
-        $this->expectException(HotelRoomAvailabilityException::class);
+        $this->expectException(RentalPlaceAvailabilityException::class);
         $this->expectExceptionMessage(sprintf(
             'Start date %s of availability is after end date %s.',
             $this->end->format('Y-m-d'),
@@ -162,7 +162,7 @@ class HotelRoomOfferServiceTest extends TestCase
             $end
         );
 
-        $this->expectException(HotelRoomAvailabilityException::class);
+        $this->expectException(RentalPlaceAvailabilityException::class);
         $this->expectExceptionMessage(sprintf(
             'Start date must be at least today, %s given.',
             $start->format('Y-m-d'),

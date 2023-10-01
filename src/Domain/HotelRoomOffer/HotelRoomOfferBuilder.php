@@ -3,6 +3,7 @@
 namespace App\Domain\HotelRoomOffer;
 
 use App\Domain\Money\Money;
+use App\Domain\RentalPlaceAvailability\RentalPlaceAvailability;
 use DateTimeImmutable;
 use stdClass;
 
@@ -51,7 +52,7 @@ class HotelRoomOfferBuilder
             $this->carry->hotelId,
             $this->carry->hotelRoomNumber,
             Money::of($this->carry->price),
-            HotelRoomAvailability::of($this->carry->start, $this->carry->end)
+            RentalPlaceAvailability::of($this->carry->start, $this->carry->end)
         );
 
         $this->carry = new stdClass();
