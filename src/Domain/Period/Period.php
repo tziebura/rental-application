@@ -87,4 +87,9 @@ class Period
 
         return false;
     }
+
+    public function isWithin(DateTimeImmutable $start, DateTimeImmutable $end): bool
+    {
+        return $this->start >= $start && $this->end <= $end;
+    }
 }

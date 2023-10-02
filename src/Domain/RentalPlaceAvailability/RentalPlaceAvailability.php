@@ -2,6 +2,7 @@
 
 namespace App\Domain\RentalPlaceAvailability;
 
+use App\Domain\Period\Period;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -42,5 +43,10 @@ class RentalPlaceAvailability
         }
 
         return new self($start, $end);
+    }
+
+    public function coversAllDaysWithin(Period $period)
+    {
+        return $period->isWithin($this->start, $this->end);
     }
 }

@@ -10,6 +10,7 @@ use App\Domain\Apartment\ApartmentNotFoundException;
 use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\Apartment\NewApartmentBookingDto;
 use App\Domain\ApartmentOffer\ApartmentOffer;
+use App\Domain\ApartmentOffer\ApartmentOfferException;
 use App\Domain\ApartmentOffer\ApartmentOfferFactory;
 use App\Domain\ApartmentOffer\ApartmentOfferNotFoundException;
 use App\Domain\ApartmentOffer\ApartmentOfferRepository;
@@ -67,7 +68,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->bookingRepository = $this->createMock(BookingRepository::class);
         $this->apartmentOfferRepository = $this->createMock(ApartmentOfferRepository::class);
 
-        $this->start = new DateTimeImmutable();
+        $this->start = (new DateTimeImmutable())->setTime(0, 0);
         $this->end = $this->start->modify('+1days');
         $this->beforeStart = $this->start->modify('-1days');
         $this->afterStart = $this->start->modify('+1days');
@@ -89,7 +90,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
-        $this->givenApartmentOfferExists();
+        $this->givenApartmentOfferExists($this->start, $this->end);
 
         $actual = $this->subject->book($this->givenNewApartmentBookingDto());
         BookingAssertion::assertThat($actual)
@@ -112,7 +113,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
-        $this->givenApartmentOfferExists();
+        $this->givenApartmentOfferExists($this->start, $this->end);
 
         $this->thenShouldPublishApartmentBookedEvent();
         $this->subject->book($this->givenNewApartmentBookingDto());
@@ -126,7 +127,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentDoesNotExist();
         $this->givenTenantExists();
         $this->givenNoBookings();
-        $this->givenApartmentOfferExists();
+        $this->givenApartmentOfferExists($this->start, $this->end);
 
         $dto = $this->givenNewApartmentBookingDto();
 
@@ -144,7 +145,7 @@ class ApartmentDomainServiceTest extends TestCase
     {
         $this->givenApartmentExists();
         $this->givenNoBookings();
-        $this->givenApartmentOfferExists();
+        $this->givenApartmentOfferExists($this->start, $this->end);
         $this->givenTenantDoesNotExist();
 
         $dto = $this->givenNewApartmentBookingDto();
@@ -163,7 +164,7 @@ class ApartmentDomainServiceTest extends TestCase
     {
         $this->givenApartmentExists();
         $this->givenTenantExists();
-        $this->givenApartmentOfferExists();
+        $this->givenApartmentOfferExists($this->start, $this->end);
         $this->givenAcceptedBookingInGivenPeriod();
 
         $dto = $this->givenNewApartmentBookingDto();
@@ -184,7 +185,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenAcceptedBookingInDifferentPeriod();
-        $this->givenApartmentOfferExists();
+        $this->givenApartmentOfferExists($this->start, $this->end);
 
         $dto = $this->givenNewApartmentBookingDto();
 
@@ -209,7 +210,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
-        $this->givenApartmentOfferExists();
+        $this->givenApartmentOfferExists($this->start, $this->end);
 
         $dto = new NewApartmentBookingDTO(
             self::APARTMENT_ID,
@@ -234,7 +235,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
-        $this->givenApartmentOfferExists();
+        $this->givenApartmentOfferExists($this->start, $this->end);
 
         $dto = new NewApartmentBookingDTO(
             self::APARTMENT_ID,
@@ -268,6 +269,30 @@ class ApartmentDomainServiceTest extends TestCase
         $dto = $this->givenNewApartmentBookingDto();
 
         $this->expectException(ApartmentOfferNotFoundException::class);
+
+        $this->thenShouldNeverPublishApartmentBookedEvent();
+
+        $this->subject->book($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeWhenApartmentOfferIsNotWithinBookingPeriod(): void
+    {
+        $this->givenApartmentExists();
+        $this->givenTenantExists();
+        $this->givenNoBookings();
+        $this->givenApartmentOfferExists($this->start->modify('+1days'), $this->start->modify('+10days'));
+
+        $dto = $this->givenNewApartmentBookingDto();
+
+        $this->expectException(ApartmentOfferException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Apartment offer is not available between %s - %s',
+            $this->start->format('Y-m-d'),
+            $this->end->format('Y-m-d')
+        ));
 
         $this->thenShouldNeverPublishApartmentBookedEvent();
 
@@ -387,12 +412,12 @@ class ApartmentDomainServiceTest extends TestCase
             ->method('publishApartmentBooked');
     }
 
-    private function givenApartmentOfferExists(): void
+    private function givenApartmentOfferExists(DateTimeImmutable $availabilityStart, DateTimeImmutable $availabilityEnd): void
     {
         $apartmentOffer = new ApartmentOffer(
             self::APARTMENT_ID,
             Money::of(self::PRICE),
-            RentalPlaceAvailability::of($this->start, $this->end)
+            RentalPlaceAvailability::of($availabilityStart, $availabilityEnd)
         );
 
         $this->apartmentOfferRepository->expects($this->atMost(1))

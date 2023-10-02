@@ -2,6 +2,7 @@
 
 namespace App\Domain\Apartment;
 
+use App\Domain\ApartmentOffer\ApartmentOfferException;
 use App\Domain\ApartmentOffer\ApartmentOfferNotFoundException;
 use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Domain\Booking\BookingRepository;
@@ -61,6 +62,10 @@ class ApartmentDomainService
 
         if (!$offer) {
             throw ApartmentOfferNotFoundException::forApartmentId($dto->getApartmentId());
+        }
+
+        if (!$offer->hasAvailabilityWithin($period)) {
+            throw ApartmentOfferException::notAvailableBetween($dto->getStart(), $dto->getEnd());
         }
 
         $apartmentBooking = new ApartmentBooking(

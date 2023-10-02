@@ -3,6 +3,7 @@
 namespace App\Domain\ApartmentOffer;
 
 use App\Domain\Money\Money;
+use App\Domain\Period\Period;
 use App\Domain\RentalPlaceAvailability\RentalPlaceAvailability;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -44,5 +45,10 @@ class ApartmentOffer
     public function getPrice(): Money
     {
         return $this->price;
+    }
+
+    public function hasAvailabilityWithin(Period $period): bool
+    {
+        return $this->availability->coversAllDaysWithin($period);
     }
 }
