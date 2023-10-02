@@ -9,12 +9,17 @@ use App\Domain\Apartment\ApartmentEventsPublisher;
 use App\Domain\Apartment\ApartmentNotFoundException;
 use App\Domain\Apartment\ApartmentRepository;
 use App\Domain\Apartment\NewApartmentBookingDto;
+use App\Domain\ApartmentOffer\ApartmentOffer;
+use App\Domain\ApartmentOffer\ApartmentOfferFactory;
+use App\Domain\ApartmentOffer\ApartmentOfferNotFoundException;
+use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingRepository;
 use App\Domain\Booking\RentalType;
 use App\Domain\Money\Money;
 use App\Domain\Period\Period;
 use App\Domain\Period\PeriodException;
+use App\Domain\RentalPlaceAvailability\RentalPlaceAvailability;
 use App\Domain\Tenant\TenantNotFoundException;
 use App\Domain\Tenant\TenantRepository;
 use App\Tests\Domain\Booking\BookingAssertion;
@@ -52,6 +57,7 @@ class ApartmentDomainServiceTest extends TestCase
     private DateTimeImmutable $end;
     private DateTimeImmutable$beforeStart;
     private DateTimeImmutable $afterStart;
+    private ApartmentOfferRepository $apartmentOfferRepository;
 
     public function setUp(): void
     {
@@ -59,6 +65,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->apartmentEventsPublisher = $this->createMock(ApartmentEventsPublisher::class);
         $this->tenantRepository = $this->createMock(TenantRepository::class);
         $this->bookingRepository = $this->createMock(BookingRepository::class);
+        $this->apartmentOfferRepository = $this->createMock(ApartmentOfferRepository::class);
 
         $this->start = new DateTimeImmutable();
         $this->end = $this->start->modify('+1days');
@@ -69,7 +76,8 @@ class ApartmentDomainServiceTest extends TestCase
             $this->apartmentRepository,
             $this->apartmentEventsPublisher,
             $this->tenantRepository,
-            $this->bookingRepository
+            $this->bookingRepository,
+            $this->apartmentOfferRepository
         );
     }
 
@@ -81,8 +89,9 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
+        $this->givenApartmentOfferExists();
 
-        $actual = $this->subject->book($this->givenApartmentBookingDto());
+        $actual = $this->subject->book($this->givenNewApartmentBookingDto());
         BookingAssertion::assertThat($actual)
             ->isApartmentBooking()
             ->hasRentalPlaceIdEqualTo(self::APARTMENT_ID)
@@ -103,9 +112,10 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
+        $this->givenApartmentOfferExists();
 
         $this->thenShouldPublishApartmentBookedEvent();
-        $this->subject->book($this->givenApartmentBookingDto());
+        $this->subject->book($this->givenNewApartmentBookingDto());
     }
 
     /**
@@ -114,7 +124,11 @@ class ApartmentDomainServiceTest extends TestCase
     public function shouldRecognizeApartmentDoesNotExistWhenBooking(): void
     {
         $this->givenApartmentDoesNotExist();
-        $dto = $this->givenApartmentBookingDto();
+        $this->givenTenantExists();
+        $this->givenNoBookings();
+        $this->givenApartmentOfferExists();
+
+        $dto = $this->givenNewApartmentBookingDto();
 
         $this->expectException(ApartmentNotFoundException::class);
 
@@ -129,9 +143,11 @@ class ApartmentDomainServiceTest extends TestCase
     public function shouldRecognizeTenantDoesNotExistWhenBooking(): void
     {
         $this->givenApartmentExists();
+        $this->givenNoBookings();
+        $this->givenApartmentOfferExists();
         $this->givenTenantDoesNotExist();
 
-        $dto = $this->givenApartmentBookingDto();
+        $dto = $this->givenNewApartmentBookingDto();
 
         $this->expectException(TenantNotFoundException::class);
 
@@ -147,9 +163,10 @@ class ApartmentDomainServiceTest extends TestCase
     {
         $this->givenApartmentExists();
         $this->givenTenantExists();
+        $this->givenApartmentOfferExists();
         $this->givenAcceptedBookingInGivenPeriod();
 
-        $dto = $this->givenApartmentBookingDto();
+        $dto = $this->givenNewApartmentBookingDto();
 
         $this->expectException(ApartmentBookingException::class);
         $this->expectExceptionMessage('There are accepted booking in given period.');
@@ -167,8 +184,9 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenAcceptedBookingInDifferentPeriod();
+        $this->givenApartmentOfferExists();
 
-        $dto = $this->givenApartmentBookingDto();
+        $dto = $this->givenNewApartmentBookingDto();
 
         $this->thenShouldPublishApartmentBookedEvent();
 
@@ -191,6 +209,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
+        $this->givenApartmentOfferExists();
 
         $dto = new NewApartmentBookingDTO(
             self::APARTMENT_ID,
@@ -215,6 +234,7 @@ class ApartmentDomainServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
+        $this->givenApartmentOfferExists();
 
         $dto = new NewApartmentBookingDTO(
             self::APARTMENT_ID,
@@ -229,6 +249,25 @@ class ApartmentDomainServiceTest extends TestCase
             $this->end->format('Y-m-d'),
             $this->start->format('Y-m-d')
         ));
+
+        $this->thenShouldNeverPublishApartmentBookedEvent();
+
+        $this->subject->book($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeWhenApartmentOfferDoesNotExist(): void
+    {
+        $this->givenApartmentExists();
+        $this->givenTenantExists();
+        $this->givenNoBookings();
+        $this->givenNotExistingApartmentOffer();
+
+        $dto = $this->givenNewApartmentBookingDto();
+
+        $this->expectException(ApartmentOfferNotFoundException::class);
 
         $this->thenShouldNeverPublishApartmentBookedEvent();
 
@@ -258,7 +297,7 @@ class ApartmentDomainServiceTest extends TestCase
 
     private function givenTenantExists(): void
     {
-        $this->tenantRepository->expects($this->once())
+        $this->tenantRepository->expects($this->atMost(1))
             ->method('exists')
             ->with(self::TENANT_ID)
             ->willReturn(true);
@@ -274,7 +313,7 @@ class ApartmentDomainServiceTest extends TestCase
 
     private function givenNoBookings(): void
     {
-        $this->bookingRepository->expects($this->once())
+        $this->bookingRepository->expects($this->atMost(1))
             ->method('findAllAcceptedBy')
             ->with(RentalType::APARTMENT, self::APARTMENT_ID)
             ->willReturn([]);
@@ -312,7 +351,7 @@ class ApartmentDomainServiceTest extends TestCase
             ->willReturn([$booking]);
     }
 
-    private function givenApartmentBookingDto(): NewApartmentBookingDTO
+    private function givenNewApartmentBookingDto(): NewApartmentBookingDTO
     {
         return new NewApartmentBookingDTO(
             self::APARTMENT_ID,
@@ -346,5 +385,27 @@ class ApartmentDomainServiceTest extends TestCase
     {
         $this->apartmentEventsPublisher->expects($this->never())
             ->method('publishApartmentBooked');
+    }
+
+    private function givenApartmentOfferExists(): void
+    {
+        $apartmentOffer = new ApartmentOffer(
+            self::APARTMENT_ID,
+            Money::of(self::PRICE),
+            RentalPlaceAvailability::of($this->start, $this->end)
+        );
+
+        $this->apartmentOfferRepository->expects($this->atMost(1))
+            ->method('findForApartment')
+            ->with(self::APARTMENT_ID)
+            ->willReturn($apartmentOffer);
+    }
+
+    private function givenNotExistingApartmentOffer(): void
+    {
+        $this->apartmentOfferRepository->expects($this->once())
+            ->method('findForApartment')
+            ->with(self::APARTMENT_ID)
+            ->willReturn(null);
     }
 }

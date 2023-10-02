@@ -66,21 +66,21 @@ class Apartment
         }, $rooms));
     }
 
-    public function book(string $tenantId, Period $period, ApartmentEventsPublisher $apartmentEventsPublisher): Booking
+    public function book(ApartmentBooking $booking): Booking
     {
-        $apartmentEventsPublisher->publishApartmentBooked(
+        $booking->getApartmentEventsPublisher()->publishApartmentBooked(
             $this->id,
             $this->ownerId,
-            $tenantId,
-            $period
+            $booking->getTenantId(),
+            $booking->getPeriod()
         );
 
         return Booking::apartment(
             $this->id,
-            $tenantId,
-            $period,
+            $booking->getTenantId(),
+            $booking->getPeriod(),
             $this->ownerId,
-            Money::of(100.0)
+            $booking->getPrice()
         );
     }
 }

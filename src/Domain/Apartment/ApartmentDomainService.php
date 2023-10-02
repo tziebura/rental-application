@@ -2,8 +2,11 @@
 
 namespace App\Domain\Apartment;
 
+use App\Domain\ApartmentOffer\ApartmentOfferNotFoundException;
+use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Domain\Booking\BookingRepository;
 use App\Domain\Booking\RentalType;
+use App\Domain\Money\Money;
 use App\Domain\Tenant\TenantNotFoundException;
 use App\Domain\Booking\Booking;
 use App\Domain\Period\Period;
@@ -16,17 +19,20 @@ class ApartmentDomainService
     private ApartmentEventsPublisher $apartmentEventsPublisher;
     private TenantRepository $tenantRepository;
     private BookingRepository $bookingRepository;
+    private ApartmentOfferRepository $apartmentOfferRepository;
 
     public function __construct(
         ApartmentRepository $apartmentRepository,
         ApartmentEventsPublisher $apartmentEventsPublisher,
         TenantRepository $tenantRepository,
-        BookingRepository $bookingRepository
+        BookingRepository $bookingRepository,
+        ApartmentOfferRepository $apartmentOfferRepository
     ) {
         $this->apartmentRepository = $apartmentRepository;
         $this->apartmentEventsPublisher = $apartmentEventsPublisher;
         $this->tenantRepository = $tenantRepository;
         $this->bookingRepository = $bookingRepository;
+        $this->apartmentOfferRepository = $apartmentOfferRepository;
     }
 
     public function book(NewApartmentBookingDto $dto): Booking
@@ -51,6 +57,19 @@ class ApartmentDomainService
             }
         }
 
-        return $apartment->book($dto->getTenantId(), $period, $this->apartmentEventsPublisher);
+        $offer = $this->apartmentOfferRepository->findForApartment($dto->getApartmentId());
+
+        if (!$offer) {
+            throw ApartmentOfferNotFoundException::forApartmentId($dto->getApartmentId());
+        }
+
+        $apartmentBooking = new ApartmentBooking(
+            $dto->getTenantId(),
+            $period,
+            $offer->getPrice(),
+            $this->apartmentEventsPublisher
+        );
+
+        return $apartment->book($apartmentBooking);
     }
 }

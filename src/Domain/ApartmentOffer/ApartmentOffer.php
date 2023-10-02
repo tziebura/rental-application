@@ -41,4 +41,8 @@ class ApartmentOffer
         $this->availability = $availability;
     }
 
+    public function getPrice(): Money
+    {
+        return $this->price;
+    }
 }
