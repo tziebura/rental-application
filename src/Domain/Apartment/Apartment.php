@@ -4,6 +4,7 @@ namespace App\Domain\Apartment;
 
 use App\Domain\Address\Address;
 use App\Domain\Booking\Booking;
+use App\Domain\Money\Money;
 use App\Domain\Period\Period;
 use App\Domain\Space\NotEnoughSpacesException;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -77,7 +78,9 @@ class Apartment
         return Booking::apartment(
             $this->id,
             $tenantId,
-            $period
+            $period,
+            $this->ownerId,
+            Money::of(100.0)
         );
     }
 }

@@ -5,6 +5,7 @@ namespace App\Tests\Domain\Booking;
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingStatus;
 use App\Domain\Booking\RentalType;
+use App\Domain\Money\Money;
 use App\Tests\PrivatePropertyManipulator;
 use PHPUnit\Framework\TestCase;
 
@@ -69,6 +70,18 @@ class BookingAssertion
     public function isAccepted(): self
     {
         TestCase::assertEquals(BookingStatus::ACCEPTED, $this->getByReflection($this->actual, 'status'));
+        return $this;
+    }
+
+    public function hasPriceEqualTo(Money $expected): self
+    {
+        TestCase::assertEquals($expected, $this->getByReflection($this->actual, 'price'));
+        return $this;
+    }
+
+    public function hasOwnerIdEqualTo(string $expected): self
+    {
+        TestCase::assertEquals($expected, $this->getByReflection($this->actual, 'ownerId'));
         return $this;
     }
 }

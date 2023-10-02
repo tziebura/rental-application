@@ -2,6 +2,7 @@
 
 namespace App\Domain\Booking;
 
+use App\Domain\Money\Money;
 use App\Domain\Period\Period;
 use App\Domain\EventChannel\EventChannel;
 use Doctrine\ORM\Mapping as ORM;
@@ -43,7 +44,16 @@ class Booking
      */
     private string $status;
 
-    public function __construct(int $rentalPlaceId, string $tenantId, string $rentalType, array $dates)
+    /**
+     * @ORM\Column()
+     */
+    private string $ownerId;
+    /**
+     * @ORM\Embedded(class="App\Domain\Money\Money")
+     */
+    private Money $price;
+
+    public function __construct(int $rentalPlaceId, string $tenantId, string $rentalType, array $dates, string $ownerId, Money $price)
     {
         $this->id = null;
         $this->rentalPlaceId = $rentalPlaceId;
@@ -51,25 +61,31 @@ class Booking
         $this->rentalType = $rentalType;
         $this->dates = $dates;
         $this->status = BookingStatus::OPEN;
+        $this->ownerId = $ownerId;
+        $this->price = $price;
     }
 
-    public static function apartment(int $apartmentId, string $tenantId, Period $period): self
+    public static function apartment(int $apartmentId, string $tenantId, Period $period, string $ownerId, Money $price): self
     {
         return new self(
             $apartmentId,
             $tenantId,
             RentalType::APARTMENT,
-            $period->asDays()
+            $period->asDays(),
+            $ownerId,
+            $price
         );
     }
 
-    public static function hotelRoom(int $hotelRoomId, string $tenantId, array $days): self
+    public static function hotelRoom(int $hotelRoomId, string $tenantId, array $days, string $ownerId, Money $price): self
     {
         return new self(
             $hotelRoomId,
             $tenantId,
             RentalType::HOTEL_ROOM,
-            $days
+            $days,
+            $ownerId,
+            $price
         );
     }
 
