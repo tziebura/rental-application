@@ -2,9 +2,15 @@
 
 namespace App\Tests\Domain\Booking;
 
+use App\Domain\Agreement\Agreement;
+use App\Domain\Agreement\AgreementRepository;
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingDomainService;
 use App\Domain\Booking\BookingEventsPublisher;
+use App\Domain\Booking\RentalType;
+use App\Domain\Money\Money;
+use App\Domain\Period\Period;
+use App\Tests\Domain\Agreement\AgreementAssertion;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
@@ -14,36 +20,47 @@ class BookingDomainServiceTest extends TestCase
     private const RENTAL_PLACE_ID = 1;
     private const TENANT_ID_1     = 'tenantId';
     private const TENANT_ID_2     = 'tenantId2';
+    private const OWNER_ID        = 'OWNER_ID';
+    private const PRICE           = 100.0;
 
     private BookingEventsPublisher $bookingEventsPublisher;
-    private array $bookingDates;
-    private array $bookingDatesWithCollision;
-    private array $bookingDatesWithoutCollision;
+    private AgreementRepository $agreementRepository;
+    private array $bookingDates = [];
+    private array $bookingDatesWithCollision = [];
+    private array $bookingDatesWithoutCollision = [];
+    private DateTimeImmutable $bookingStart;
+    private DateTimeImmutable $bookingEnd;
 
     private BookingDomainService $subject;
 
     public function setUp(): void
     {
         $this->bookingEventsPublisher = $this->createMock(BookingEventsPublisher::class);
+        $this->agreementRepository = $this->createMock(AgreementRepository::class);
+
         $this->subject = new BookingDomainService(
-            $this->bookingEventsPublisher
+            $this->bookingEventsPublisher,
+            $this->agreementRepository
         );
 
+        $this->bookingStart = (new DateTimeImmutable())->setTime(0, 0);
+        $this->bookingEnd = $this->bookingStart->modify('+1days');
+
         $this->bookingDates = [
-            new DateTimeImmutable('2023-08-24'),
-            new DateTimeImmutable('2023-08-25'),
+            $this->bookingStart->format('Y-m-d'),
+            $this->bookingEnd->format('Y-m-d'),
         ];
 
         $this->bookingDatesWithCollision = [
-            new DateTimeImmutable('2023-08-24'),
-            new DateTimeImmutable('2023-08-25'),
-            new DateTimeImmutable('2023-08-26'),
+            $this->bookingStart->format('Y-m-d'),
+            $this->bookingStart->modify('+1days')->format('Y-m-d'),
+            $this->bookingStart->modify('+2days')->format('Y-m-d'),
         ];
 
         $this->bookingDatesWithoutCollision = [
-            new DateTimeImmutable('2023-08-26'),
-            new DateTimeImmutable('2023-08-27'),
-            new DateTimeImmutable('2023-08-28'),
+            $this->bookingStart->modify('+2days')->format('Y-m-d'),
+            $this->bookingStart->modify('+3days')->format('Y-m-d'),
+            $this->bookingStart->modify('+4days')->format('Y-m-d'),
         ];
     }
 
@@ -52,20 +69,28 @@ class BookingDomainServiceTest extends TestCase
      */
     public function shouldAcceptBookingWhenNoOtherBookingsFound(): void
     {
-        $booking = $this->givenBooking();
+        $booking = $this->givenApartmentBooking();
 
-        $this->subject->accept($booking, []);
+        $actual = $this->subject->accept($booking, []);
 
         BookingAssertion::assertThat($booking)
             ->isAccepted();
+
+        AgreementAssertion::assertThat($actual)
+            ->hasRentalTypeEqualTo(RentalType::APARTMENT)
+            ->hasRentalPlaceIdEqualTo(self::RENTAL_PLACE_ID)
+            ->hasOwnerIdEqualTo(self::OWNER_ID)
+            ->hasTenantIdEqualTo(self::TENANT_ID_1)
+            ->hasDaysEqualTo($this->bookingDates)
+            ->hasPriceEqualTo(Money::of(self::PRICE));
     }
 
     /**
      * @test
      */
-    public function shouldPublisherEventWhenBookingIsAccepted(): void
+    public function shouldPublishEventWhenBookingIsAccepted(): void
     {
-        $booking = $this->givenBooking();
+        $booking = $this->givenApartmentBooking();
 
         $this->thenBookingAcceptedEventShouldBePublished();
         $this->subject->accept($booking, []);
@@ -79,22 +104,26 @@ class BookingDomainServiceTest extends TestCase
         $booking = $this->givenBooking();
         $bookings = [$this->givenAcceptedBookingWithCollision()];
 
-        $this->subject->accept($booking, $bookings);
+        $actual = $this->subject->accept($booking, $bookings);
 
         BookingAssertion::assertThat($booking)
             ->isRejected();
+
+        $this->assertNull($actual);
     }
 
     /**
      * @test
      */
-    public function shouldPublisherEventWhenBookingIsRejected(): void
+    public function shouldPublishEventWhenBookingIsRejected(): void
     {
         $booking = $this->givenBooking();
         $bookings = [$this->givenAcceptedBookingWithCollision()];
 
         $this->thenBookingRejectedEventShouldBePublished();
-        $this->subject->accept($booking, $bookings);
+        $actual = $this->subject->accept($booking, $bookings);
+
+        $this->assertNull($actual);
     }
 
     /**
@@ -146,6 +175,24 @@ class BookingDomainServiceTest extends TestCase
     /**
      * @test
      */
+    public function shouldCreateAgreementWhenBookingAccepted(): void
+    {
+        $booking = $this->givenApartmentBooking();
+
+        // TODO move this test to BookingCommandHandler
+        // TODO refactor other tests
+        // TODO add unit test to BookingCommandHandler checking if Agreement was not saved if booking for rejected during acceptance
+        // TODO implement infrastructure - AgreementRepository
+        $this->thenAgreementShouldBeSaved();
+        $this->subject->accept($booking, []);
+
+        BookingAssertion::assertThat($booking)
+            ->isAccepted();
+    }
+
+    /**
+     * @test
+     */
     public function shouldRejectBookingWhenAtLeastOneWithCollisionFound(): void
     {
         $booking = $this->givenBooking();
@@ -168,7 +215,9 @@ class BookingDomainServiceTest extends TestCase
             self::RENTAL_PLACE_ID,
             self::TENANT_ID_1,
             self::RENTAL_TYPE,
-            $this->bookingDates
+            $this->bookingDates,
+            self::OWNER_ID,
+            Money::of(self::PRICE)
         );
     }
 
@@ -178,7 +227,9 @@ class BookingDomainServiceTest extends TestCase
             self::RENTAL_PLACE_ID,
             self::TENANT_ID_2,
             self::RENTAL_TYPE,
-            $this->bookingDatesWithCollision
+            $this->bookingDatesWithCollision,
+            self::OWNER_ID,
+            Money::of(self::PRICE)
         );
 
         $booking->accept($this->createMock(BookingEventsPublisher::class));
@@ -189,7 +240,7 @@ class BookingDomainServiceTest extends TestCase
     {
         $this->bookingEventsPublisher->expects($this->once())
             ->method('publishBookingAccepted')
-            ->with(self::RENTAL_TYPE, self::RENTAL_PLACE_ID, self::TENANT_ID_1, $this->bookingDates);
+            ->with(RentalType::APARTMENT, self::RENTAL_PLACE_ID, self::TENANT_ID_1, $this->bookingDates);
     }
 
     private function thenBookingRejectedEventShouldBePublished(): void
@@ -205,7 +256,9 @@ class BookingDomainServiceTest extends TestCase
             self::RENTAL_PLACE_ID,
             self::TENANT_ID_2,
             self::RENTAL_TYPE,
-            $this->bookingDatesWithoutCollision
+            $this->bookingDatesWithoutCollision,
+            self::OWNER_ID,
+            Money::of(self::PRICE)
         );
 
         $booking->accept($this->createMock(BookingEventsPublisher::class));
@@ -218,7 +271,9 @@ class BookingDomainServiceTest extends TestCase
             self::RENTAL_PLACE_ID,
             self::TENANT_ID_2,
             self::RENTAL_TYPE,
-            $this->bookingDatesWithCollision
+            $this->bookingDatesWithCollision,
+            self::OWNER_ID,
+            Money::of(self::PRICE)
         );
     }
 
@@ -228,10 +283,39 @@ class BookingDomainServiceTest extends TestCase
             self::RENTAL_PLACE_ID,
             self::TENANT_ID_2,
             self::RENTAL_TYPE,
-            $this->bookingDatesWithCollision
+            $this->bookingDatesWithCollision,
+            self::OWNER_ID,
+            Money::of(self::PRICE)
         );
 
         $booking->reject($this->createMock(BookingEventsPublisher::class));
         return $booking;
+    }
+
+    private function givenApartmentBooking(): Booking
+    {
+        return Booking::apartment(
+            self::RENTAL_PLACE_ID,
+            self::TENANT_ID_1,
+            Period::of($this->bookingStart, $this->bookingEnd),
+            self::OWNER_ID,
+            Money::of(self::PRICE)
+        );
+    }
+
+    private function thenAgreementShouldBeSaved(): void
+    {
+        $this->agreementRepository->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (Agreement $actual) {
+                AgreementAssertion::assertThat($actual)
+                    ->hasRentalTypeEqualTo(RentalType::APARTMENT)
+                    ->hasRentalPlaceIdEqualTo(self::RENTAL_PLACE_ID)
+                    ->hasOwnerIdEqualTo(self::OWNER_ID)
+                    ->hasTenantIdEqualTo(self::TENANT_ID_1)
+                    ->hasDaysEqualTo($this->bookingDates)
+                    ->hasPriceEqualTo(Money::of(self::PRICE));
+                return true;
+            }));
     }
 }

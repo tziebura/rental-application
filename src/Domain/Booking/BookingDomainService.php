@@ -2,26 +2,34 @@
 
 namespace App\Domain\Booking;
 
+use App\Domain\Agreement\Agreement;
+use App\Domain\Agreement\AgreementRepository;
+
 class BookingDomainService
 {
     private BookingEventsPublisher $bookingEventsPublisher;
+    private AgreementRepository $agreementRepository;
 
-    public function __construct(BookingEventsPublisher $bookingEventsPublisher)
+    public function __construct(BookingEventsPublisher $bookingEventsPublisher, AgreementRepository $agreementRepository)
     {
         $this->bookingEventsPublisher = $bookingEventsPublisher;
+        $this->agreementRepository = $agreementRepository;
     }
 
     /**
      * @param Booking $booking
      * @param Booking[] $bookings
-     * @return void
+     * @return Agreement|null
      */
-    public function accept(Booking $booking, array $bookings)
+    public function accept(Booking $booking, array $bookings): ?Agreement
     {
         if ($this->canAcceptBooking($booking, $bookings)) {
-            $booking->accept($this->bookingEventsPublisher);
+            $agreement = $booking->accept($this->bookingEventsPublisher);
+            $this->agreementRepository->save($agreement);
+            return $agreement;
         } else {
             $booking->reject($this->bookingEventsPublisher);
+            return null;
         }
     }
 

@@ -2,9 +2,10 @@
 
 namespace App\Domain\Booking;
 
+use App\Domain\Agreement\Agreement;
+use App\Domain\Agreement\AgreementBuilder;
 use App\Domain\Money\Money;
 use App\Domain\Period\Period;
-use App\Domain\EventChannel\EventChannel;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -48,6 +49,7 @@ class Booking
      * @ORM\Column()
      */
     private string $ownerId;
+
     /**
      * @ORM\Embedded(class="App\Domain\Money\Money")
      */
@@ -105,7 +107,7 @@ class Booking
         );
     }
 
-    public function accept(BookingEventsPublisher $bookingEventsPublisher)
+    public function accept(BookingEventsPublisher $bookingEventsPublisher): Agreement
     {
         if ($this->status === BookingStatus::REJECTED) {
             throw NotAllowedBookingStatusTransitionException::with($this->status, BookingStatus::ACCEPTED);
@@ -119,6 +121,15 @@ class Booking
             $this->tenantId,
             $this->dates
         );
+
+        return AgreementBuilder::create()
+            ->withRentalType($this->rentalType)
+            ->withRentalPlaceId($this->rentalPlaceId)
+            ->withTenantId($this->tenantId)
+            ->withOwnerId($this->ownerId)
+            ->withDays($this->dates)
+            ->withPrice($this->price)
+            ->build();
     }
 
     public function hasCollisionWith(Booking $other): bool

@@ -84,3 +84,9 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Domain/RentalPlaceAvailability'
                 prefix: 'App\Domain\RentalPlaceAvailability'
                 alias: RentalPlaceAvailability
+            Agreement:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Domain/Agreement'
+                prefix: 'App\Domain\Agreement'
+                alias: Agreement

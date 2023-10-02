@@ -62,11 +62,11 @@ class Period
     public function asDays(): array
     {
         $start = $this->start;
-        $days  = [$start];
+        $days  = [$start->format('Y-m-d')];
 
         while ($start < $this->end) {
             $start = $start->modify('+1day');
-            $days[] = $start;
+            $days[] = $start->format('Y-m-d');
         }
 
         return $days;
