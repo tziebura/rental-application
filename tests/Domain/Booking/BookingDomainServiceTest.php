@@ -175,24 +175,6 @@ class BookingDomainServiceTest extends TestCase
     /**
      * @test
      */
-    public function shouldCreateAgreementWhenBookingAccepted(): void
-    {
-        $booking = $this->givenApartmentBooking();
-
-        // TODO move this test to BookingCommandHandler
-        // TODO refactor other tests
-        // TODO add unit test to BookingCommandHandler checking if Agreement was not saved if booking for rejected during acceptance
-        // TODO implement infrastructure - AgreementRepository
-        $this->thenAgreementShouldBeSaved();
-        $this->subject->accept($booking, []);
-
-        BookingAssertion::assertThat($booking)
-            ->isAccepted();
-    }
-
-    /**
-     * @test
-     */
     public function shouldRejectBookingWhenAtLeastOneWithCollisionFound(): void
     {
         $booking = $this->givenBooking();
@@ -301,21 +283,5 @@ class BookingDomainServiceTest extends TestCase
             self::OWNER_ID,
             Money::of(self::PRICE)
         );
-    }
-
-    private function thenAgreementShouldBeSaved(): void
-    {
-        $this->agreementRepository->expects($this->once())
-            ->method('save')
-            ->with($this->callback(function (Agreement $actual) {
-                AgreementAssertion::assertThat($actual)
-                    ->hasRentalTypeEqualTo(RentalType::APARTMENT)
-                    ->hasRentalPlaceIdEqualTo(self::RENTAL_PLACE_ID)
-                    ->hasOwnerIdEqualTo(self::OWNER_ID)
-                    ->hasTenantIdEqualTo(self::TENANT_ID_1)
-                    ->hasDaysEqualTo($this->bookingDates)
-                    ->hasPriceEqualTo(Money::of(self::PRICE));
-                return true;
-            }));
     }
 }

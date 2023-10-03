@@ -3,8 +3,10 @@
 namespace App\Tests\Domain\Apartment;
 
 use App\Domain\Apartment\Apartment;
+use App\Domain\Apartment\ApartmentBooking;
 use App\Domain\Apartment\ApartmentBuilder;
 use App\Domain\Apartment\ApartmentEventsPublisher;
+use App\Domain\Money\Money;
 use App\Domain\Period\Period;
 use App\Domain\Space\NotEnoughSpacesException;
 use App\Tests\Domain\Booking\BookingAssertion;
@@ -64,9 +66,12 @@ class ApartmentTest extends TestCase
         $apartment = $this->createApartment();
         $this->setByReflection($apartment, 'id', self::APARTMENT_ID);
         $actual = $apartment->book(
-            self::TENANT_ID,
-            $period,
-            $this->apartmentEventsPublisher
+            new ApartmentBooking(
+                self::TENANT_ID,
+                $period,
+                Money::of(100.0),
+                $this->apartmentEventsPublisher
+            )
         );
 
         BookingAssertion::assertThat($actual)
@@ -98,9 +103,12 @@ class ApartmentTest extends TestCase
             );
 
         $apartment->book(
-            self::TENANT_ID,
-            $period,
-            $this->apartmentEventsPublisher
+            new ApartmentBooking(
+                self::TENANT_ID,
+                $period,
+                Money::of(100.0),
+                $this->apartmentEventsPublisher
+            )
         );
     }
 

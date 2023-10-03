@@ -8,12 +8,10 @@ use App\Domain\Agreement\AgreementRepository;
 class BookingDomainService
 {
     private BookingEventsPublisher $bookingEventsPublisher;
-    private AgreementRepository $agreementRepository;
 
-    public function __construct(BookingEventsPublisher $bookingEventsPublisher, AgreementRepository $agreementRepository)
+    public function __construct(BookingEventsPublisher $bookingEventsPublisher)
     {
         $this->bookingEventsPublisher = $bookingEventsPublisher;
-        $this->agreementRepository = $agreementRepository;
     }
 
     /**
@@ -25,7 +23,6 @@ class BookingDomainService
     {
         if ($this->canAcceptBooking($booking, $bookings)) {
             $agreement = $booking->accept($this->bookingEventsPublisher);
-            $this->agreementRepository->save($agreement);
             return $agreement;
         } else {
             $booking->reject($this->bookingEventsPublisher);

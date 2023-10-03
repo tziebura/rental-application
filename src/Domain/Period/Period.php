@@ -57,7 +57,7 @@ class Period
     }
 
     /**
-     * @return DateTimeImmutable[]
+     * @return string[]
      */
     public function asDays(): array
     {
@@ -77,10 +77,9 @@ class Period
         $days = $this->asDays();
 
         foreach ($days as $day) {
-            $dayAsDate = $day->format('Y-m-d');
             $dateString = $date->format('Y-m-d');
 
-            if ($dayAsDate === $dateString) {
+            if ($day === $dateString) {
                 return true;
             }
         }

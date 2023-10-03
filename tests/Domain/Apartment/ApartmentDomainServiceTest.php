@@ -98,8 +98,8 @@ class ApartmentDomainServiceTest extends TestCase
             ->hasRentalPlaceIdEqualTo(self::APARTMENT_ID)
             ->hasTenantIdEqualTo(self::TENANT_ID)
             ->hasDaysEqualTo([
-                $this->start,
-                $this->end
+                $this->start->format('Y-m-d'),
+                $this->end->format('Y-m-d')
             ])
             ->hasPriceEqualTo(Money::of(self::PRICE))
             ->hasOwnerIdEqualTo(self::OWNER_ID);
@@ -197,8 +197,8 @@ class ApartmentDomainServiceTest extends TestCase
             ->hasRentalPlaceIdEqualTo(self::APARTMENT_ID)
             ->hasTenantIdEqualTo(self::TENANT_ID)
             ->hasDaysEqualTo([
-                $this->start,
-                $this->end
+                $this->start->format('Y-m-d'),
+                $this->end->format('Y-m-d')
             ]);
     }
 

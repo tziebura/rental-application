@@ -5,6 +5,7 @@ namespace App\Tests\Domain\Booking;
 use App\Domain\Booking\Booking;
 use App\Domain\Booking\BookingAccepted;
 use App\Domain\Booking\NotAllowedBookingStatusTransitionException;
+use App\Domain\Money\Money;
 use App\Domain\Period\Period;
 use App\Domain\Booking\BookingEventsPublisher;
 use App\Domain\Booking\RentalType;
@@ -17,6 +18,8 @@ class BookingTest extends TestCase
 {
     private const RENTAL_PLACE_ID = 1;
     private const TENANT_ID = 'tenantId';
+    const OWNER_ID = 'owner_id';
+    const PRICE = 100.0;
 
     private Period $period;
     private BookingEventsPublisher $bookingEventsPublisher;
@@ -38,7 +41,9 @@ class BookingTest extends TestCase
         $actual = Booking::apartment(
             self::RENTAL_PLACE_ID,
             self::TENANT_ID,
-            $this->period
+            $this->period,
+            self::OWNER_ID,
+            Money::of(self::PRICE)
         );
 
         BookingAssertion::assertThat($actual)
@@ -144,7 +149,9 @@ class BookingTest extends TestCase
         return Booking::hotelRoom(
             self::RENTAL_PLACE_ID,
             self::TENANT_ID,
-            $this->period->asDays()
+            $this->period->asDays(),
+            self::OWNER_ID,
+            Money::of(self::PRICE)
         );
     }
 }

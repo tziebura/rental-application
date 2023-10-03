@@ -8,8 +8,12 @@ use App\Application\Apartment\ApartmentDTO;
 use App\Application\Apartment\OwnerNotFoundException;
 use App\Domain\Apartment\ApartmentBookingException;
 use App\Domain\Apartment\ApartmentDomainService;
+use App\Domain\ApartmentOffer\ApartmentOffer;
+use App\Domain\ApartmentOffer\ApartmentOfferRepository;
 use App\Domain\Booking\RentalType;
+use App\Domain\Money\Money;
 use App\Domain\Period\PeriodException;
+use App\Domain\RentalPlaceAvailability\RentalPlaceAvailability;
 use App\Domain\Tenant\TenantNotFoundException;
 use App\Domain\Apartment\Apartment;
 use App\Domain\Apartment\ApartmentBuilder;
@@ -56,6 +60,7 @@ class ApartmentApplicationServiceTest extends TestCase
     private DateTimeImmutable $end;
     private OwnerRepository $ownerRepository;
     private TenantRepository $tenantRepository;
+    private ApartmentOfferRepository $apartmentOfferRepository;
     private DateTimeImmutable $beforeStart;
     private DateTimeImmutable $afterStart;
 
@@ -66,7 +71,8 @@ class ApartmentApplicationServiceTest extends TestCase
         $this->tenantRepository = $this->createMock(TenantRepository::class);
         $this->apartmentEventsPublisher = $this->createMock(ApartmentEventsPublisher::class);
         $this->bookingRepository = $this->createMock(BookingRepository::class);
-        $this->start = new DateTimeImmutable();
+        $this->apartmentOfferRepository = $this->createMock(ApartmentOfferRepository::class);
+        $this->start = (new DateTimeImmutable())->setTime(0, 0);
         $this->end = $this->start->modify('+1days');
         $this->beforeStart = $this->start->modify('-1days');
         $this->afterStart = $this->start->modify('+1days');
@@ -79,7 +85,8 @@ class ApartmentApplicationServiceTest extends TestCase
                 $this->apartmentRepository,
                 $this->apartmentEventsPublisher,
                 $this->tenantRepository,
-                $this->bookingRepository
+                $this->bookingRepository,
+                $this->apartmentOfferRepository
             )
         );
     }
@@ -152,6 +159,7 @@ class ApartmentApplicationServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
+        $this->givenApartmentOfferExists();
 
         $this->thenShouldSaveBooking();
         $this->subject->book($this->givenApartmentBookingDto());
@@ -165,6 +173,7 @@ class ApartmentApplicationServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenNoBookings();
+        $this->givenApartmentOfferExists();
 
         $this->thenShouldPublishApartmentBookedEvent();
         $this->subject->book($this->givenApartmentBookingDto());
@@ -232,6 +241,7 @@ class ApartmentApplicationServiceTest extends TestCase
         $this->givenApartmentExists();
         $this->givenTenantExists();
         $this->givenAcceptedBookingInDifferentPeriod();
+        $this->givenApartmentOfferExists();
 
         $dto = $this->givenApartmentBookingDto();
 
@@ -322,7 +332,7 @@ class ApartmentApplicationServiceTest extends TestCase
             ->method('save')
             ->with($this->callback(function (Booking $actual) {
                 BookingAssertion::assertThat($actual)
-                    ->hasDaysEqualTo([$this->start, $this->end])
+                    ->hasDaysEqualTo([$this->start->format('Y-m-d'), $this->end->format('Y-m-d')])
                     ->isApartmentBooking()
                     ->hasTenantIdEqualTo(self::TENANT_ID)
                     ->hasRentalPlaceIdEqualTo(self::APARTMENT_ID);
@@ -461,7 +471,9 @@ class ApartmentApplicationServiceTest extends TestCase
         $booking = Booking::apartment(
             self::APARTMENT_ID,
             self::TENANT_ID,
-            new Period($this->beforeStart, $this->afterStart)
+            new Period($this->beforeStart, $this->afterStart),
+            self::OWNER_ID,
+            Money::of(100.0)
         );
 
         $this->bookingRepository->expects($this->once())
@@ -475,12 +487,28 @@ class ApartmentApplicationServiceTest extends TestCase
         $booking = Booking::apartment(
             self::APARTMENT_ID,
             self::TENANT_ID,
-            new Period($this->beforeStart->modify('-10days'), $this->beforeStart)
+            new Period($this->beforeStart->modify('-10days'), $this->beforeStart),
+            self::OWNER_ID,
+            Money::of(100.0)
         );
 
         $this->bookingRepository->expects($this->once())
             ->method('findAllAcceptedBy')
             ->with(RentalType::APARTMENT, self::APARTMENT_ID)
             ->willReturn([$booking]);
+    }
+
+    private function givenApartmentOfferExists(): void
+    {
+        $apartmentOffer = new ApartmentOffer(
+            self::APARTMENT_ID,
+            Money::of(100.0),
+            RentalPlaceAvailability::of($this->start, $this->end)
+        );
+
+        $this->apartmentOfferRepository->expects($this->once())
+            ->method('findForApartment')
+            ->with(self::APARTMENT_ID)
+            ->willReturn($apartmentOffer);
     }
 }

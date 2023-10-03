@@ -2,6 +2,7 @@
 
 namespace App\Application\Booking;
 
+use App\Domain\Agreement\AgreementRepository;
 use App\Domain\Booking\BookingDomainService;
 use App\Domain\Booking\BookingEventsPublisher;
 use App\Domain\Booking\BookingRepository;
@@ -12,20 +13,18 @@ class BookingCommandHandler implements EventSubscriberInterface
     private BookingRepository $bookingRepository;
     private BookingEventsPublisher $bookingEventsPublisher;
     private BookingDomainService $bookingDomainService;
+    private AgreementRepository $agreementRepository;
 
-    /**
-     * @param BookingRepository $bookingRepository
-     * @param BookingEventsPublisher $bookingEventsPublisher
-     * @param BookingDomainService $bookingDomainService
-     */
     public function __construct(
         BookingRepository $bookingRepository,
         BookingEventsPublisher $bookingEventsPublisher,
-        BookingDomainService $bookingDomainService
+        BookingDomainService $bookingDomainService,
+        AgreementRepository $agreementRepository
     ) {
         $this->bookingRepository = $bookingRepository;
         $this->bookingEventsPublisher = $bookingEventsPublisher;
         $this->bookingDomainService = $bookingDomainService;
+        $this->agreementRepository = $agreementRepository;
     }
 
     public static function getSubscribedEvents(): array
@@ -49,8 +48,12 @@ class BookingCommandHandler implements EventSubscriberInterface
         $booking  = $this->bookingRepository->findById($command->getId());
         $bookings = $this->bookingRepository->findAllBy($booking->getRentalType(), $booking->getRentalPlaceId());
 
-        $this->bookingDomainService->accept($booking, $bookings);
+        $agreement = $this->bookingDomainService->accept($booking, $bookings);
 
         $this->bookingRepository->save($booking);
+
+        if ($agreement) {
+            $this->agreementRepository->save($agreement);
+        }
     }
 }

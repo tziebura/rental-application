@@ -3,6 +3,7 @@
 namespace App\Domain\Hotel;
 
 use App\Domain\Booking\Booking;
+use App\Domain\Money\Money;
 use App\Domain\Space\Space;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -64,7 +65,9 @@ class HotelRoom
         return Booking::hotelRoom(
             $this->id,
             $tenantId,
-            $days
+            $days,
+            'ownerId',
+            Money::of(100.0)
         );
     }
 

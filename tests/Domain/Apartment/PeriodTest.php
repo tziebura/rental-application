@@ -21,9 +21,9 @@ class PeriodTest extends TestCase
 
         $this->assertEquals(
             [
-                $start,
-                $start->modify('+1days'),
-                $end,
+                $start->format('Y-m-d'),
+                $start->modify('+1days')->format('Y-m-d'),
+                $end->format('Y-m-d'),
             ],
             $actual->asDays()
         );

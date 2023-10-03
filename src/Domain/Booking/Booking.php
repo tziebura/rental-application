@@ -156,6 +156,10 @@ class Booking
     public function isFor(Period $period): bool
     {
         foreach ($this->dates as $date) {
+            if (!$date instanceof \DateTimeInterface) {
+                $date = \DateTimeImmutable::createFromFormat('Y-m-d', $date);
+            }
+
             if ($period->contains($date)) {
                 return true;
             }

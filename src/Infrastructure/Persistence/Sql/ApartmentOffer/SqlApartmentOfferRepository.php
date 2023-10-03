@@ -18,4 +18,11 @@ class SqlApartmentOfferRepository implements ApartmentOfferRepository
     {
         $this->repository->save($apartmentOffer);
     }
+
+    public function findForApartment(string $id): ?ApartmentOffer
+    {
+        return $this->repository->findOneBy([
+            'apartmentId' => $id,
+        ]);
+    }
 }

@@ -18,6 +18,7 @@ services:
     App\Domain\User\UserRepository: '@App\Infrastructure\Persistence\Sql\User\SqlUserRepository'
     App\Domain\Owner\OwnerRepository: '@App\Infrastructure\Persistence\Sql\Owner\SqlOwnerRepository'
     App\Domain\Tenant\TenantRepository: '@App\Infrastructure\Persistence\Sql\Tenant\SqlTenantRepository'
+    App\Domain\Agreement\AgreementRepository: '@App\Infrastructure\Persistence\Sql\Agreement\SqlAgreementRepository'
 
     App\Framework\Symfony\Extension\RequestDTOResolver:
         arguments:
