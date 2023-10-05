@@ -1,6 +1,6 @@
 <?php
 
-namespace Infrastructure\AddressService;
+namespace App\Tests\Infrastructure\AddressService;
 
 use App\Domain\Address\AddressDto;
 use App\Infrastructure\AddressService\RestAddressCatalogueClient;
