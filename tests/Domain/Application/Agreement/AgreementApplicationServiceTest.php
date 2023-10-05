@@ -23,7 +23,7 @@ class AgreementApplicationServiceTest extends TestCase
     private const PRICE = 100.0;
     private const RENTAL_PLACE_ID = 1;
     private const DAYS = ["2023-10-01", "2023-10-02", "2023-10-03"];
-    const RENTAL_TYPE = RentalType::APARTMENT;
+    private const RENTAL_TYPE = RentalType::APARTMENT;
 
     private AgreementRepository $agreementRepository;
     private EventChannel $eventChannel;
