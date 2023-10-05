@@ -20,6 +20,7 @@ services:
     App\Domain\Tenant\TenantRepository: '@App\Infrastructure\Persistence\Sql\Tenant\SqlTenantRepository'
     App\Domain\Agreement\AgreementRepository: '@App\Infrastructure\Persistence\Sql\Agreement\SqlAgreementRepository'
     App\Domain\Address\AddressCatalogue: '@App\Infrastructure\AddressService\RestAddressCatalogueClient'
+    App\Domain\Payment\PaymentService: '@App\Infrastructure\AddressService\RestAddressCatalogueClient'
 
     App\Framework\Symfony\Extension\RequestDTOResolver:
         arguments:
@@ -61,3 +62,10 @@ services:
     App\Domain\Apartment\ApartmentFactory: ~
     App\Domain\ApartmentOffer\ApartmentOfferFactory: ~
     App\Domain\Apartment\ApartmentDomainService: ~
+    App\Domain\Payment\PaymentFactory: ~
+
+    App\Domain\Payment\PaymentEventsPublisher:
+        arguments:
+            - '@app.event.event_id_factory'
+            - '@app.event.event_creation_time_factory'
+            - '@App\Domain\EventChannel\EventChannel'
