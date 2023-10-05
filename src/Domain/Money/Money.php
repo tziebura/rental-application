@@ -27,4 +27,9 @@ class Money
 
         return new self($price);
     }
+
+    public function getValue(): float
+    {
+        return $this->value;
+    }
 }

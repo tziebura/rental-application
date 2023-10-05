@@ -18,4 +18,9 @@ class SqlAgreementRepository implements AgreementRepository
     {
         $this->repository->save($agreement);
     }
+
+    public function findById(int $id): ?Agreement
+    {
+        return $this->repository->find($id);
+    }
 }

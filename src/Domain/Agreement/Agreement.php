@@ -58,4 +58,16 @@ class Agreement
         $this->price = $price;
     }
 
+    public function accept(AgreementEventsPublisher $publisher): void
+    {
+        $publisher->publishAgreementAccepted(
+            $this->rentalType,
+            $this->rentalPlaceId,
+            $this->ownerId,
+            $this->tenantId,
+            $this->price->getValue(),
+            $this->days
+        );
+    }
+
 }
