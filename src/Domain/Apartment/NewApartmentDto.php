@@ -2,6 +2,8 @@
 
 namespace App\Domain\Apartment;
 
+use App\Domain\Address\AddressDto;
+
 class NewApartmentDto
 {
     private string $ownerId;
@@ -79,5 +81,16 @@ class NewApartmentDto
     public function getRoomsDefinition(): array
     {
         return $this->roomsDefinition;
+    }
+
+    public function addressDto(): AddressDto
+    {
+        return new AddressDto(
+            $this->street,
+            $this->houseNumber,
+            $this->postalCode,
+            $this->city,
+            $this->country
+        );
     }
 }

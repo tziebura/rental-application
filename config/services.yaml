@@ -19,6 +19,7 @@ services:
     App\Domain\Owner\OwnerRepository: '@App\Infrastructure\Persistence\Sql\Owner\SqlOwnerRepository'
     App\Domain\Tenant\TenantRepository: '@App\Infrastructure\Persistence\Sql\Tenant\SqlTenantRepository'
     App\Domain\Agreement\AgreementRepository: '@App\Infrastructure\Persistence\Sql\Agreement\SqlAgreementRepository'
+    App\Domain\Address\AddressCatalogue: '@App\Infrastructure\AddressService\RestAddressCatalogueClient'
 
     App\Framework\Symfony\Extension\RequestDTOResolver:
         arguments:

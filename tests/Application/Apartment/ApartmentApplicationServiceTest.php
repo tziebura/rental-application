@@ -6,6 +6,9 @@ use App\Application\Apartment\ApartmentApplicationService;
 use App\Application\Apartment\ApartmentBookingDTO;
 use App\Application\Apartment\ApartmentDTO;
 use App\Application\Apartment\OwnerNotFoundException;
+use App\Domain\Address\AddressCatalogue;
+use App\Domain\Address\AddressDto;
+use App\Domain\Address\AddressException;
 use App\Domain\Apartment\ApartmentBookingException;
 use App\Domain\Apartment\ApartmentDomainService;
 use App\Domain\ApartmentOffer\ApartmentOffer;
@@ -60,6 +63,7 @@ class ApartmentApplicationServiceTest extends TestCase
     private DateTimeImmutable $end;
     private OwnerRepository $ownerRepository;
     private TenantRepository $tenantRepository;
+    private AddressCatalogue $addressCatalogue;
     private ApartmentOfferRepository $apartmentOfferRepository;
     private DateTimeImmutable $beforeStart;
     private DateTimeImmutable $afterStart;
@@ -72,6 +76,7 @@ class ApartmentApplicationServiceTest extends TestCase
         $this->apartmentEventsPublisher = $this->createMock(ApartmentEventsPublisher::class);
         $this->bookingRepository = $this->createMock(BookingRepository::class);
         $this->apartmentOfferRepository = $this->createMock(ApartmentOfferRepository::class);
+        $this->addressCatalogue = $this->createMock(AddressCatalogue::class);
         $this->start = (new DateTimeImmutable())->setTime(0, 0);
         $this->end = $this->start->modify('+1days');
         $this->beforeStart = $this->start->modify('-1days');
@@ -79,7 +84,7 @@ class ApartmentApplicationServiceTest extends TestCase
 
         $this->subject = new ApartmentApplicationService(
             $this->apartmentRepository,
-            new ApartmentFactory($this->ownerRepository),
+            new ApartmentFactory($this->ownerRepository, $this->addressCatalogue),
             $this->bookingRepository,
             new ApartmentDomainService(
                 $this->apartmentRepository,
@@ -97,6 +102,7 @@ class ApartmentApplicationServiceTest extends TestCase
     public function shouldCreateApartmentWithAllInformation(): void
     {
         $this->givenOwnerExists();
+        $this->givenAddressExists();
         $dto = $this->givenApartmentDto(self::ROOMS_DEFINITION);
 
         $this->thenApartmentShouldBeSaved();
@@ -109,9 +115,25 @@ class ApartmentApplicationServiceTest extends TestCase
     public function shouldRecognizeOwnerDoesNotExist(): void
     {
         $this->givenOwnerDoesNotExist();
+        $this->givenAddressExists();
         $dto = $this->givenApartmentDto(self::ROOMS_DEFINITION);
 
         $this->expectException(OwnerNotFoundException::class);
+        $this->thenApartmentShouldNeverBeSaved();
+
+        $this->subject->add($dto);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRecognizeAddressDoesNotExist(): void
+    {
+        $this->givenOwnerExists();
+        $this->givenAddressDoesNotExist();
+        $dto = $this->givenApartmentDto(self::ROOMS_DEFINITION);
+
+        $this->expectException(AddressException::class);
         $this->thenApartmentShouldNeverBeSaved();
 
         $this->subject->add($dto);
@@ -126,6 +148,7 @@ class ApartmentApplicationServiceTest extends TestCase
         $roomsDefinition['zeroRoom'] = 0;
 
         $this->givenOwnerExists();
+        $this->givenAddressExists();
         $dto = $this->givenApartmentDto($roomsDefinition);
 
         $this->expectException(SquareMeterException::class);
@@ -143,6 +166,7 @@ class ApartmentApplicationServiceTest extends TestCase
         $roomsDefinition['lessThanZeroRoom'] = -1;
 
         $this->givenOwnerExists();
+        $this->givenAddressExists();
         $dto = $this->givenApartmentDto($roomsDefinition);
 
         $this->expectException(SquareMeterException::class);
@@ -510,5 +534,21 @@ class ApartmentApplicationServiceTest extends TestCase
             ->method('findForApartment')
             ->with(self::APARTMENT_ID)
             ->willReturn($apartmentOffer);
+    }
+
+    private function givenAddressExists(): void
+    {
+        $this->addressCatalogue->expects($this->atMost(1))
+            ->method('exists')
+            ->with(new AddressDto(self::STREET, self::HOUSE_NUMBER, self::POSTAL_CODE, self::CITY, self::COUNTRY))
+            ->willReturn(true);
+    }
+
+    private function givenAddressDoesNotExist(): void
+    {
+        $this->addressCatalogue->expects($this->atMost(1))
+            ->method('exists')
+            ->with(new AddressDto(self::STREET, self::HOUSE_NUMBER, self::POSTAL_CODE, self::CITY, self::COUNTRY))
+            ->willReturn(false);
     }
 }
