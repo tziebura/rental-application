@@ -31,4 +31,29 @@ class AddressVerificationRequest
 
         return json_encode($data);
     }
+
+    public function getStreet(): string
+    {
+        return $this->street;
+    }
+
+    public function getBuildingNumber(): string
+    {
+        return $this->buildingNumber;
+    }
+
+    public function getPostalCode(): string
+    {
+        return $this->postalCode;
+    }
+
+    public function getCity(): string
+    {
+        return $this->city;
+    }
+
+    public function getCountry(): string
+    {
+        return $this->country;
+    }
 }

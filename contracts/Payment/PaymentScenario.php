@@ -22,4 +22,14 @@ class PaymentScenario
     {
         return $this->response->serialize();
     }
+
+    public function getRequest(): PaymentRequest
+    {
+        return $this->request;
+    }
+
+    public function getResponse(): PaymentResponse
+    {
+        return $this->response;
+    }
 }

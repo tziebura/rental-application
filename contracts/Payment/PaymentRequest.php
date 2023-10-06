@@ -25,4 +25,19 @@ class PaymentRequest
 
         return json_encode($data);
     }
+
+    public function getSenderId(): string
+    {
+        return $this->senderId;
+    }
+
+    public function getRecipientId(): string
+    {
+        return $this->recipientId;
+    }
+
+    public function getAmount(): float
+    {
+        return $this->amount;
+    }
 }

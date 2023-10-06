@@ -22,4 +22,14 @@ class AddressVerificationScenario
     {
         return $this->response->serialize();
     }
+
+    public function getRequest(): AddressVerificationRequest
+    {
+        return $this->request;
+    }
+
+    public function getResponse(): AddressVerificationResponse
+    {
+        return $this->response;
+    }
 }

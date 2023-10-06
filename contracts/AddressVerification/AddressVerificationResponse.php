@@ -17,4 +17,9 @@ class AddressVerificationResponse
             'status' => $this->status,
         ]);
     }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
 }

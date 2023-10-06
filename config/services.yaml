@@ -1,3 +1,7 @@
+parameters:
+    url.address_service: '%env(ADDRESS_SERVICE_URL)%'
+    url.payment_service: '%env(PAYMENT_SERVICE_URL)%'
+
 services:
     _defaults:
         autowire: true
@@ -69,3 +73,17 @@ services:
             - '@app.event.event_id_factory'
             - '@app.event.event_creation_time_factory'
             - '@App\Domain\EventChannel\EventChannel'
+
+    GuzzleHttp\Client: ~
+    App\Infrastructure\AddressService\RestAddressCatalogueClient:
+        arguments:
+            - '@GuzzleHttp\Client'
+            - '%url.address_service%'
+            - '@serializer'
+
+    App\Infrastructure\PaymentService\RestPaymentServiceClient:
+        public: true
+        arguments:
+            - '@GuzzleHttp\Client'
+            - '%url.payment_service%'
+            - '@serializer'
