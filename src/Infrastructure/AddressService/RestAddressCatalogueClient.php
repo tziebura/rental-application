@@ -6,7 +6,6 @@ use App\Domain\Address\AddressCatalogue;
 use App\Domain\Address\AddressDto;
 use App\Domain\Address\AddressVerification;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
