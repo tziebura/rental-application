@@ -26,8 +26,3 @@ services:
             MYSQL_ROOT_PASSWORD: root
         ports:
             - "3306:3306"
-
-networks:
-    default:
-        external:
-            name: rental-application-external_default
