@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
       libssh-dev \
     && docker-php-ext-install intl opcache pdo_mysql bcmath sockets sysvsem \
     && pecl install apcu amqp xdebug \
-    && docker-php-ext-enable apcu xdebug amqp \
+    && docker-php-ext-enable apcu amqp \
     && docker-php-ext-configure zip \
     && docker-php-ext-install zip
 
